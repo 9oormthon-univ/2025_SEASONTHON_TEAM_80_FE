@@ -1,5 +1,5 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import type * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface KakaoLoginButtonProps extends React.ComponentProps<"button"> {
   className?: string;
@@ -26,7 +26,7 @@ function KakaoLoginButton({
     <button
       className={cn(
         "inline-flex items-center justify-center gap-2",
-        "w-[360px] h-[53px]",
+        "h-[53px] w-[360px]",
         "bg-[#F4E237]",
         "text-[#3B1E1E]",
         "text-[20px]",
@@ -34,13 +34,13 @@ function KakaoLoginButton({
         "font-bold",
         "hover:bg-[#F4E237]/90",
         "focus:outline-none focus:ring-2 focus:ring-[#F4E237]/50",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         "transition-colors",
         className
       )}
       {...props}
     >
-      <KakaoIcon className="w-[27px] h-[27px]" />
+      <KakaoIcon className="h-[27px] w-[27px]" />
       {children || "카카오로 계속하기"}
     </button>
   );

@@ -1,7 +1,8 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-interface NicknameInputProps extends Omit<React.ComponentProps<"input">, 'onChange'> {
+interface NicknameInputProps
+  extends Omit<React.ComponentProps<"input">, "onChange"> {
   className?: string;
   value?: string;
   onChange?: (value: string) => void;
@@ -37,7 +38,7 @@ function NicknameInput({
         onChange={handleChange}
         placeholder="최대 12자"
         className={cn(
-          "w-[360px] h-[48px]",
+          "h-[48px] w-[360px]",
           "px-4 py-3",
           "rounded-[8px]",
           "text-[16px]",
@@ -65,11 +66,13 @@ function NicknameInput({
         {...props}
       />
       {/* 글자 수 표시 */}
-      <div className={cn(
-        "absolute right-3 top-1/2 transform -translate-y-1/2",
-        "text-sm",
-        hasError ? "text-[#BA3D41]" : "text-[#D9D9D9]"
-      )}>
+      <div
+        className={cn(
+          "-translate-y-1/2 absolute top-1/2 right-3 transform",
+          "text-sm",
+          hasError ? "text-[#BA3D41]" : "text-[#D9D9D9]"
+        )}
+      >
         {inputValue.length}/12
       </div>
     </div>

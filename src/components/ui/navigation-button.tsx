@@ -1,5 +1,5 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import type * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface NavigationButtonProps extends React.ComponentProps<"button"> {
   className?: string;
@@ -17,7 +17,7 @@ function NavigationButton({
     <button
       className={cn(
         "inline-flex items-center justify-center",
-        "w-[360px] h-[46px]",
+        "h-[46px] w-[360px]",
         "text-[16px]",
         "rounded-[8px]",
         "font-bold",
