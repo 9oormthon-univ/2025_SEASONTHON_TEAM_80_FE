@@ -36,7 +36,7 @@ function NicknameInput({
         type="text"
         value={inputValue}
         onChange={handleChange}
-        placeholder="최대 12자"
+        placeholder="최대 6자"
         className={cn(
           "h-[48px] w-[360px]",
           "px-4 py-3",
@@ -73,7 +73,7 @@ function NicknameInput({
           hasError ? "text-[#BA3D41]" : "text-[#D9D9D9]"
         )}
       >
-        {inputValue.length}/12
+        {inputValue.length}/6
       </div>
     </div>
   );
