@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import { useState } from "react";
+import EllipsisIcon from "@/assets/ellipsis.svg?react";
+import { cn } from "@/lib/utils";
 
 interface PaginationProps {
   totalPages: number;
@@ -34,26 +35,37 @@ function Pagination({
   };
 
   const getPageNumbers = () => {
-    const maxPages = 5;
-    const pages = [];
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
 
-    if (totalPages <= maxPages) {
-      // 총 페이지가 5개 이하면 모든 페이지 표시
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+    const pages: (number | string)[] = [];
+
+    if (currentPage <= 3) {
+      pages.push(1, 2, 3, 4, 5);
+      if (totalPages > 5) {
+        pages.push("...", totalPages);
+      }
+    } else if (currentPage >= totalPages - 2) {
+      pages.push(1);
+      if (totalPages > 5) {
+        pages.push("...");
+      }
+      for (let i = totalPages - 4; i <= totalPages; i++) {
+        if (i > 1) pages.push(i);
       }
     } else {
-      // 현재 페이지를 중심으로 5개 페이지 계산
-      let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
-      const endPage = Math.min(totalPages, startPage + maxPages - 1);
-
-      // 끝 페이지가 총 페이지보다 작으면 시작 페이지 조정
-      if (endPage - startPage + 1 < maxPages) {
-        startPage = Math.max(1, endPage - maxPages + 1);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
+      if (currentPage === 4) {
+        pages.push(1, 2, 3, 4, 5, "...", totalPages);
+      } else if (currentPage === totalPages - 3) {
+        pages.push(1, "...");
+        for (let i = totalPages - 5; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1, "...");
+        pages.push(currentPage - 1, currentPage, currentPage + 1);
+        pages.push("...", totalPages);
       }
     }
 
@@ -81,23 +93,37 @@ function Pagination({
 
       {/* 페이지 번호들 */}
       <div className="flex items-center justify-center gap-2">
-        {getPageNumbers().map((pageNumber) => (
-          <button
-            type="button"
-            key={pageNumber}
-            onClick={() => handlePageChange(pageNumber)}
-            className={cn(
-              "relative flex h-4 w-4 items-center justify-center rounded-full transition-colors",
-              currentPage === pageNumber
-                ? "bg-yellow-50 text-zinc-800"
-                : "text-yellow-50 hover:text-yellow-100"
-            )}
-          >
-            <span className="font-primary text-sm leading-tight tracking-tight">
-              {pageNumber}
-            </span>
-          </button>
-        ))}
+        {getPageNumbers().map((item, index) => {
+          if (item === "...") {
+            return (
+              <EllipsisIcon
+                key={`ellipsis-${
+                  // biome-ignore lint/suspicious/noArrayIndexKey: explanation
+                  index
+                }`}
+              />
+            );
+          }
+
+          const pageNumber = item as number;
+          return (
+            <button
+              type="button"
+              key={pageNumber}
+              onClick={() => handlePageChange(pageNumber)}
+              className={cn(
+                "relative flex h-6 w-6 items-center justify-center rounded-full transition-colors",
+                currentPage === pageNumber
+                  ? "bg-yellow-50 text-zinc-800"
+                  : "text-yellow-50 hover:text-yellow-100"
+              )}
+            >
+              <span className="font-primary text-sm leading-tight tracking-tight">
+                {pageNumber}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* 다음 버튼 */}
