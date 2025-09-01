@@ -6,6 +6,7 @@ import react from "@vitejs/plugin-react";
 // biome-ignore lint/style/useNodejsImportProtocol: path module is required for Vite alias configuration
 import path from "path";
 import { defineConfig } from "vite";
+import svgr from "vite-plugin-svgr";
 
 const dirname =
   typeof __dirname !== "undefined"
@@ -13,7 +14,7 @@ const dirname =
     : path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), svgr()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
