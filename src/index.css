@@ -129,3 +129,15 @@
         @apply bg-background text-foreground;
     }
 }
+
+@font-face {
+  font-family: 'Cafe24Danjunghae';
+  src: url('/fonts/Cafe24Danjunghae-v2.0.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-primary: 'Cafe24Danjunghae', sans-serif;
+}
