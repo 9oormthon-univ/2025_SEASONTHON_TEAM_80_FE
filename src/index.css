@@ -1,11 +1,16 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 @import "tailwindcss";
 @import "tw-animate-css";
 @custom-variant dark (&:is(.dark *));
 
 :root {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     line-height: 1.5;
     font-weight: 400;
+
+    /* 폰트 변수 정의 */
+    --font-pretendard: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-accent: 'Noto Sans KR', sans-serif; /* 특정 요소용 폰트 */
 
     color-scheme: light dark;
     color: rgba(255, 255, 255, 0.87);
@@ -127,5 +132,6 @@
     }
     body {
         @apply bg-background text-foreground;
+        font-family: var(--font-pretendard);
     }
 }
