@@ -1,5 +1,12 @@
-// 디데이 계산 컴포넌트
-const DDayCounter = () => {
+import type * as React from "react";
+import { cn } from "@/lib/utils";
+
+interface DDayCounterProps extends React.ComponentProps<"div"> {
+  days?: number;
+  className?: string;
+}
+
+const DDayCounter = ({ days, className, ...props }: DDayCounterProps) => {
   const calculateDDay = () => {
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -11,8 +18,8 @@ const DDayCounter = () => {
     return daysDiff;
   };
 
-  const daysLeft = calculateDDay();
-  const daysStr = daysLeft.toString().padStart(3, "0");
+  const daysLeft = days ?? calculateDDay();
+  const daysStr = daysLeft.toString();
 
   // 자릿수에 따른 너비 계산
   const getWidth = (days: number) => {
@@ -23,18 +30,18 @@ const DDayCounter = () => {
 
   return (
     <div
+      className={cn(
+        "flex items-center justify-center",
+        "h-[32px]",
+        "bg-white/10",
+        "rounded",
+        "font-bold text-[14px] text-white",
+        className
+      )}
       style={{
         width: `${getWidth(daysLeft)}px`,
-        height: "32px",
-        backgroundColor: "rgba(255, 255, 255, 0.1)",
-        borderRadius: "4px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "14px",
-        fontWeight: "bold",
-        color: "rgba(255, 255, 255, 1.0)",
       }}
+      {...props}
     >
       새해까지 D-{daysStr}
     </div>
