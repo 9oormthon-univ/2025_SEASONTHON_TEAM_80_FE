@@ -18,7 +18,8 @@
     "check": "biome check --write .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
   "packageManager": "pnpm@10.15.0",
   "dependencies": {
