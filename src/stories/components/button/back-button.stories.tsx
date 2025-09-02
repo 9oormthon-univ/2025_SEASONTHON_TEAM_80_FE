@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { BackButton } from "@/components/ui/back-button";
 import { MemoryRouter } from "react-router-dom";
+import { BackButton } from "@/components/ui/back-button";
 
 const meta = {
   title: "Components/button/back-button",

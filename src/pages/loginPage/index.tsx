@@ -1,4 +1,3 @@
-import LandingBg from "@/assets/bg_landing.svg";
 import LogoIcon from "@/assets/ic_logo.svg?react";
 import NotesIcon from "@/assets/ic_notes.svg?react";
 import { DDayCounter } from "@/pages/loginPage/components/dday-counter";
@@ -6,15 +5,7 @@ import { KakaoLoginButton } from "@/pages/loginPage/components/kakao-login-butto
 
 function LoginPage() {
   return (
-    <div
-      className="fixed top-0 left-0 h-screen w-screen overflow-hidden bg-center bg-no-repeat"
-      style={{
-        backgroundColor: "#412716",
-        backgroundImage: `url(${LandingBg})`,
-        backgroundSize: "390px auto",
-        backgroundPosition: "center -20px",
-      }}
-    >
+    <div>
       {/* 디데이 표기 창 */}
       <div
         className="-translate-x-1/2 absolute left-1/2 transform"

@@ -1,11 +1,11 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import AppShell from "./layouts/AppShell";
 import {
   JoinCompletePage,
   JoinNicknamePage,
   LetterGuidePage,
   LoginPage,
 } from "./pages";
-import AppShell from "./layouts/AppShell";
 
 function App() {
   return (

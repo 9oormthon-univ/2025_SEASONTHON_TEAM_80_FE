@@ -1,5 +1,5 @@
-import { BackButton } from "@/components/ui/back-button";
 import CDPlayerImage from "@/assets/obj_cdplayer.webp";
+import { BackButton } from "@/components/ui/back-button";
 import { NavigationButton } from "@/components/ui/navigation-button";
 
 export default function JoinCompletePage() {
