@@ -1,4 +1,4 @@
-import { useState, type SetStateAction } from "react";
+import { useState, type ChangeEvent } from "react";
 import { SearchInput } from "@/components/ui/search-input";
 import { BackButton } from "@/components/ui/back-button";
 import { NavigationButton } from "@/components/ui/navigation-button";
@@ -59,7 +59,7 @@ function MusicSearchPage() {
       <div className="px-4 pb-6 flex justify-center">
         <SearchInput
           value={searchQuery}
-          onChange={(e: { target: { value: SetStateAction<string>; }; }) => setSearchQuery(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
           placeholder="곡, 앨범, 아티스트 명으로 검색"
         />
       </div>
