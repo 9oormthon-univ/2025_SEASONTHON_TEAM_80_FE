@@ -1,7 +1,7 @@
 import { useState } from "react";
-import ChevronLeftIcon from "@/assets/chevron_left.svg?react";
-import ChevronRightIcon from "@/assets/chevron_right.svg?react";
-import EllipsisIcon from "@/assets/ellipsis.svg?react";
+import ChevronLeftIcon from "@/assets/ic_chevron_left.svg?react";
+import ChevronRightIcon from "@/assets/ic_chevron_right.svg?react";
+import EllipsisIcon from "@/assets/ic_ellipsis.svg?react";
 import { cn } from "@/lib/utils";
 
 interface PaginationProps {
