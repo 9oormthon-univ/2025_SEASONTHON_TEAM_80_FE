@@ -2,7 +2,7 @@ import { PageLayout } from "@/components/ui/page-layout";
 import LetterStep from "../components/letter-step";
 
 interface LetterGuidePageProps {
-  nickname: string;
+  nickname?: string;
 }
 
 export default function LetterGuidePage({
