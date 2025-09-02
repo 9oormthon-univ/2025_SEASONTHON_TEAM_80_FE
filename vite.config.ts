@@ -14,7 +14,15 @@ const dirname =
     : path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), svgr()],
+  plugins: [
+    react(), 
+    tailwindcss(), 
+    svgr({
+      svgrOptions: {
+        exportType: "default",
+      },
+    })
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
