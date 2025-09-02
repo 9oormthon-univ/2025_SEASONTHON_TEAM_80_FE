@@ -17,7 +17,7 @@ function NavigationButton({
     <button
       className={cn(
         "inline-flex items-center justify-center",
-        "h-[46px] w-[360px]",
+        "h-[46px] w-full",
         "text-[16px]",
         "rounded-[8px]",
         "font-bold",

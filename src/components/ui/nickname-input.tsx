@@ -36,9 +36,9 @@ function NicknameInput({
         type="text"
         value={inputValue}
         onChange={handleChange}
-        placeholder="최대 6자"
+        placeholder="별명을 입력해주세요."
         className={cn(
-          "h-[48px] w-[360px]",
+          "h-[48px] w-full",
           "px-4 py-3",
           "rounded-[8px]",
           "text-[16px]",
