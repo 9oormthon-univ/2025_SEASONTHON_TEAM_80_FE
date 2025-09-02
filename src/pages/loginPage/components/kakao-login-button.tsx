@@ -1,4 +1,5 @@
 import type * as React from "react";
+import KakaoSvg from "@/assets/ic_kakao.svg?react";
 import { cn } from "@/lib/utils";
 
 interface KakaoLoginButtonProps extends React.ComponentProps<"button"> {
@@ -8,13 +9,7 @@ interface KakaoLoginButtonProps extends React.ComponentProps<"button"> {
 
 // 카카오 로고 SVG 컴포넌트
 const KakaoIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/kakaoIcon.svg"
-    alt="카카오 로고"
-    className={className}
-    width="27"
-    height="27"
-  />
+  <KakaoSvg className={className} width={27} height={27} />
 );
 
 function KakaoLoginButton({

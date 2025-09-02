@@ -1,3 +1,6 @@
+import LandingBg from "@/assets/bg_landing.svg";
+import LogoIcon from "@/assets/ic_logo.svg?react";
+import NotesIcon from "@/assets/ic_notes.svg?react";
 import { DDayCounter } from "@/pages/loginPage/components/dday-counter";
 import { KakaoLoginButton } from "@/pages/loginPage/components/kakao-login-button";
 
@@ -7,7 +10,7 @@ function LoginPage() {
       className="fixed top-0 left-0 h-screen w-screen overflow-hidden bg-center bg-no-repeat"
       style={{
         backgroundColor: "#412716",
-        backgroundImage: "url('/landingBackground.svg')",
+        backgroundImage: `url(${LandingBg})`,
         backgroundSize: "390px auto",
         backgroundPosition: "center -20px",
       }}
@@ -25,9 +28,7 @@ function LoginPage() {
         className="-translate-x-1/2 absolute left-1/2 transform"
         style={{ top: "76px" }}
       >
-        <img
-          src="/landingLogo.svg"
-          alt="Landing Logo"
+        <LogoIcon
           style={{
             width: "210px",
             height: "auto",
@@ -51,9 +52,7 @@ function LoginPage() {
         className="-translate-x-1/2 absolute left-1/2 transform"
         style={{ top: "444px" }}
       >
-        <img
-          src="/landingNote.svg"
-          alt="Landing Note"
+        <NotesIcon
           style={{
             width: "358px",
             height: "auto",
