@@ -86,8 +86,8 @@ function Pagination({
         className={cn(
           "font-primary text-base leading-snug transition-colors",
           currentPage <= 1
-            ? "cursor-not-allowed text-[#E6DACA]/40"
-            : "text-[#E6DACA] hover:text-[#E6DACA]/80"
+            ? "cursor-not-allowed text-brown-100/40"
+            : "text-brown-100 hover:text-brown-100/80"
         )}
       >
         <ChevronLeftIcon />
@@ -116,8 +116,8 @@ function Pagination({
               className={cn(
                 "relative flex h-6 w-6 items-center justify-center rounded-full transition-colors",
                 currentPage === pageNumber
-                  ? "bg-yellow-50 text-zinc-800"
-                  : "text-yellow-50 hover:text-yellow-100"
+                  ? "bg-brown-100 text-brown-300"
+                  : "text-brown-100 hover:text-brown-100/80"
               )}
             >
               <span className="font-primary text-sm leading-tight tracking-tight">
@@ -136,8 +136,8 @@ function Pagination({
         className={cn(
           "font-primary text-base leading-snug transition-colors",
           currentPage >= totalPages
-            ? "cursor-not-allowed text-[#E6DACA]/40"
-            : "text-[#E6DACA] hover:text-[#E6DACA]/80"
+            ? "cursor-not-allowed text-brown-100"
+            : "text-brown-100 hover:text-brown-100/80"
         )}
       >
         <ChevronRightIcon />

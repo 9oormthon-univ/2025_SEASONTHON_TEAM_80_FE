@@ -6,7 +6,7 @@ export default function JoinCompletePage() {
   return (
     <div className="relative flex h-full w-full flex-col pt-26 sm:pt-36 md:pt-40">
       <BackButton />
-      <p className="mt-3 font-primary text-[#4D282C] text-[32px] leading-12">
+      <p className="mt-3 font-primary text-[32px] text-red-200 leading-12">
         나만의 LP 보드가
         <br />
         만들어졌어요! <br />
