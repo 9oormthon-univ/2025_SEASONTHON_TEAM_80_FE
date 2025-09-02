@@ -15,52 +15,61 @@ interface MusicListProps {
   onToggleSelection: (songId: string) => void;
 }
 
-export function MusicList({ songs, selectedSongs, onToggleSelection }: MusicListProps) {
+export function MusicList({
+  songs,
+  selectedSongs,
+  onToggleSelection,
+}: MusicListProps) {
   return (
     <div className="space-y-0">
       {songs.map((song) => (
-        <div 
-          key={song.id} 
-          className={`relative w-[calc(100vw)] max-w-[393px] h-[70px] flex items-center px-4 ${
-            selectedSongs.includes(song.id) ? 'bg-opacity-r100-3' : ''
+        <div
+          key={song.id}
+          className={`relative flex h-[70px] w-[calc(100vw)] max-w-[393px] items-center px-4 ${
+            selectedSongs.includes(song.id) ? "bg-opacity-r100-3" : ""
           }`}
         >
           {/* 앨범 사진 */}
-          <div className="w-[42px] h-[42px] bg-gray-300 rounded-md overflow-hidden">
-            <img 
-              src={song.album_cover} 
+          <div className="h-[42px] w-[42px] overflow-hidden rounded-md bg-gray-300">
+            <img
+              src={song.album_cover}
               alt={`${song.song_title} 앨범 커버`}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
               onError={(e) => {
-                e.currentTarget.style.display = 'none';
+                e.currentTarget.style.display = "none";
               }}
             />
           </div>
-          
+
           {/* 음악 정보 */}
-          <div className="flex-1 ml-4">
+          <div className="ml-4 flex-1">
             <div className="mt-[15px]">
-              <h3 className="text-[16px] font-semibold text-gray-700">{song.song_title}</h3>
-              <p className="text-[12px] font-normal text-gray-500 mt-[1px]">{song.artist}</p>
+              <h3 className="font-semibold text-[16px] text-gray-700">
+                {song.song_title}
+              </h3>
+              <p className="mt-[1px] font-normal text-[12px] text-gray-500">
+                {song.artist}
+              </p>
             </div>
           </div>
-          
+
           {/* 체크박스 */}
           <div className="flex justify-end">
             <button
+              type="button"
               onClick={() => onToggleSelection(song.id)}
-              className="w-[24px] h-[24px] flex items-center justify-center"
+              className="flex h-[24px] w-[24px] items-center justify-center"
             >
               {selectedSongs.includes(song.id) ? (
-                <CheckSquareIcon className="w-[24px] h-[24px]" />
+                <CheckSquareIcon className="h-[24px] w-[24px]" />
               ) : (
-                <SquareIcon className="w-[24px] h-[24px]" />
+                <SquareIcon className="h-[24px] w-[24px]" />
               )}
             </button>
           </div>
-          
+
           {/* 하단 구분선 */}
-          <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-[#E6E6E6]"></div>
+          <div className="absolute right-4 bottom-0 left-4 h-[1px] bg-[#E6E6E6]"></div>
         </div>
       ))}
     </div>

@@ -3,8 +3,8 @@ import AppShell from "./layouts/AppShell";
 import {
   JoinCompletePage,
   JoinNicknamePage,
-  LoginPage,
   LetterGuidePage,
+  LoginPage,
   MusicSearchPage,
 } from "./pages";
 

@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
-import { cn } from "@/lib/utils";
 import LensIcon from "@/assets/ic_lens.svg?react";
+import { cn } from "@/lib/utils";
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   className?: string;
@@ -9,24 +9,19 @@ interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   ({ className, ...props }, ref) => {
     return (
-      <div 
-        className={cn(
-          "relative flex items-center w-[360px] h-12",
-          className
-        )}
+      <div
+        className={cn("relative flex h-12 w-[360px] items-center", className)}
       >
-        <LensIcon 
-          className="absolute left-4 w-[18px] h-[18px] text-gray-700 pointer-events-none" 
-        />
+        <LensIcon className="pointer-events-none absolute left-4 h-[18px] w-[18px] text-gray-700" />
         <input
           ref={ref}
           type="text"
           placeholder="곡, 앨범, 아티스트 명으로 검색"
           className={cn(
-            "w-full h-full pl-12 pr-4",
-            "bg-gray-200 rounded-md",
-            "text-gray-700 font-semibold text-base",
-            "placeholder:text-gray-400 placeholder:font-semibold placeholder:text-base",
+            "h-full w-full pr-4 pl-12",
+            "rounded-md bg-gray-200",
+            "font-semibold text-base text-gray-700",
+            "placeholder:font-semibold placeholder:text-base placeholder:text-gray-400",
             "border-none outline-none",
             "focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
           )}
