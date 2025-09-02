@@ -1,4 +1,6 @@
 import { useState } from "react";
+import ChevronLeftIcon from "@/assets/chevron_left.svg?react";
+import ChevronRightIcon from "@/assets/chevron_right.svg?react";
 import EllipsisIcon from "@/assets/ellipsis.svg?react";
 import { cn } from "@/lib/utils";
 
@@ -84,11 +86,11 @@ function Pagination({
         className={cn(
           "font-primary text-base leading-snug transition-colors",
           currentPage <= 1
-            ? "cursor-not-allowed text-yellow-50/50"
-            : "text-yellow-50 hover:text-yellow-100"
+            ? "cursor-not-allowed text-[#E6DACA]/40"
+            : "text-[#E6DACA] hover:text-[#E6DACA]/80"
         )}
       >
-        &lt;
+        <ChevronLeftIcon />
       </button>
 
       {/* 페이지 번호들 */}
@@ -134,11 +136,11 @@ function Pagination({
         className={cn(
           "font-primary text-base leading-snug transition-colors",
           currentPage >= totalPages
-            ? "cursor-not-allowed text-yellow-50/50"
-            : "text-yellow-50 hover:text-yellow-100"
+            ? "cursor-not-allowed text-[#E6DACA]/40"
+            : "text-[#E6DACA] hover:text-[#E6DACA]/80"
         )}
       >
-        &gt;
+        <ChevronRightIcon />
       </button>
     </div>
   );
