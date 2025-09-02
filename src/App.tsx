@@ -1,5 +1,10 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { JoinCompletePage, JoinNicknamePage, LoginPage } from "./pages";
+import {
+  JoinCompletePage,
+  JoinNicknamePage,
+  LetterGuidePage,
+  LoginPage,
+} from "./pages";
 import AppShell from "./layouts/AppShell";
 
 function App() {
@@ -10,6 +15,7 @@ function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/join/nickname" element={<JoinNicknamePage />} />
           <Route path="/join/complete" element={<JoinCompletePage />} />
+          <Route path="/letter/guide" element={<LetterGuidePage />} />
         </Routes>
       </AppShell>
     </Router>
