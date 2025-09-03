@@ -67,10 +67,10 @@ export default function LetterWritePage() {
           />
         </div>
 
-        <img 
-          src={LetterPaperBg} 
-          alt="편지지 배경" 
-          className="absolute bottom-[89px] z-10" 
+        <img
+          src={LetterPaperBg}
+          alt="편지지 배경"
+          className="absolute bottom-[89px] z-10"
         />
 
         {/* 편지지 내부 콘텐츠 영역 */}
@@ -137,7 +137,7 @@ export default function LetterWritePage() {
           </div>
         </div>
       </PageLayout>
-      
+
       <SendAlert
         isOpen={isAlertOpen}
         onClose={handleCancel}

@@ -13,11 +13,7 @@ export default function LetterPaper({
   return (
     <div className={`relative ${className}`}>
       {/* 편지지 배경 */}
-      <img 
-        src={LetterPaperBg} 
-        alt="편지지 배경" 
-        className="z-10"
-      />
+      <img src={LetterPaperBg} alt="편지지 배경" className="z-10" />
 
       {/* 편지지 내부 콘텐츠 영역 - 디버깅용 배경색 추가 */}
       <div className="absolute top-0 left-0 z-20 h-[294px] w-[294px] bg-red-100 bg-opacity-50 px-5 py-5">
