@@ -1,5 +1,5 @@
-import { createPortal } from "react-dom";
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import WarnIcon from "@/assets/ic_warn.svg?react";
 
 interface SendAlertProps {
@@ -17,15 +17,15 @@ export function SendAlert({ isOpen, onClose, onConfirm }: SendAlertProps) {
 
   useEffect(() => {
     if (!isOpen || !mounted || typeof document === "undefined") return;
-    
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    
+
     document.body.style.overflow = "hidden";
     confirmRef.current?.focus();
     document.addEventListener("keydown", onKeyDown);
-    
+
     return () => {
       document.body.style.overflow = "";
       document.removeEventListener("keydown", onKeyDown);
@@ -71,7 +71,11 @@ export function SendAlert({ isOpen, onClose, onConfirm }: SendAlertProps) {
               backgroundColor: "rgb(142 45 45 / 0.03)", // --color-red-100 3%
             }}
           />
-          <WarnIcon className="relative z-10" aria-hidden="true" focusable="false" />
+          <WarnIcon
+            className="relative z-10"
+            aria-hidden="true"
+            focusable="false"
+          />
         </div>
 
         <div
