@@ -5,20 +5,9 @@ import { KakaoLoginButton } from "@/pages/loginPage/components/kakao-login-butto
 
 function LoginPage() {
   return (
-    <div>
-      {/* 디데이 표기 창 */}
-      <div
-        className="-translate-x-1/2 absolute left-1/2 transform"
-        style={{ top: "545px" }}
-      >
-        <DDayCounter />
-      </div>
-
+    <div className="flex min-h-screen flex-col">
       {/* 로고 */}
-      <div
-        className="-translate-x-1/2 absolute left-1/2 transform"
-        style={{ top: "76px" }}
-      >
+      <div className="flex flex-1 items-start justify-center pt-16">
         <LogoIcon
           style={{
             width: "210px",
@@ -30,19 +19,21 @@ function LoginPage() {
         />
       </div>
 
-      <div
-        className="-translate-x-1/2 absolute left-1/2 transform"
-        style={{ top: "596px" }}
-      >
+      {/* 하단 요소들 - 하단에서부터 위로 배치 */}
+      <div className="flex flex-col-reverse items-center pb-10">
         {/* 카카오 로그인 버튼 */}
-        <KakaoLoginButton onClick={() => console.log("카카오 로그인 클릭!")} />
-      </div>
+        <div>
+          <KakaoLoginButton
+            onClick={() => console.log("카카오 로그인 클릭!")}
+          />
+        </div>
 
-      {/* 랜딩 노트 */}
-      <div
-        className="-translate-x-1/2 absolute left-1/2 transform"
-        style={{ top: "444px" }}
-      >
+        {/* 디데이 표기 창 */}
+        <div className="mb-4">
+          <DDayCounter />
+        </div>
+
+        {/* 랜딩 노트 */}
         <NotesIcon
           style={{
             width: "358px",
