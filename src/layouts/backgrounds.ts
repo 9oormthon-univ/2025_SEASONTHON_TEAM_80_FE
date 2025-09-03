@@ -6,4 +6,7 @@ export const routeBg: Record<string, string> = {
   "/join/nickname": bgPaper,
   "/join/complete": bgPaper,
   "/letter/guide": bgPaper,
+  "/letter/select": bgPaper,
+  "/letter/write": bgPaper,
+  "/letter/complete": bgPaper,
 };
