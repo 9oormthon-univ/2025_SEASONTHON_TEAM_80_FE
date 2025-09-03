@@ -3,7 +3,10 @@ import AppShell from "./layouts/AppShell";
 import {
   JoinCompletePage,
   JoinNicknamePage,
+  LetterCompletePage,
   LetterGuidePage,
+  LetterSelectPage,
+  LetterWritePage,
   LoginPage,
   MusicSearchPage,
 } from "./pages";
@@ -18,6 +21,9 @@ function App() {
           <Route path="/join/complete" element={<JoinCompletePage />} />
           <Route path="/letter/guide" element={<LetterGuidePage />} />
           <Route path="/letter/search" element={<MusicSearchPage />} />
+          <Route path="/letter/select" element={<LetterSelectPage />} />
+          <Route path="/letter/write" element={<LetterWritePage />} />
+          <Route path="/letter/complete" element={<LetterCompletePage />} />
         </Routes>
       </AppShell>
     </Router>

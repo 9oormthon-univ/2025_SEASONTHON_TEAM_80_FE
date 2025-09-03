@@ -1,5 +1,8 @@
 export { default as JoinCompletePage } from "./joinPage/pages/join-complete-page";
 export { default as JoinNicknamePage } from "./joinPage/pages/join-nickname-page";
+export { default as LetterCompletePage } from "./letterPage/pages/letter-complete-page";
 export { default as LetterGuidePage } from "./letterPage/pages/letter-guide-page";
 export { default as MusicSearchPage } from "./letterPage/pages/letter-search-page";
+export { default as LetterSelectPage } from "./letterPage/pages/letter-select-page";
+export { default as LetterWritePage } from "./letterPage/pages/letter-write-page";
 export { default as LoginPage } from "./loginPage";
