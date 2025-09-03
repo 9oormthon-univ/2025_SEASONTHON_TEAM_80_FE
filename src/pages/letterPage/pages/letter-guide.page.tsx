@@ -1,4 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import { PageLayout } from "@/components/ui/page-layout";
+import { SearchInput } from "@/components/ui/search-input";
 import LetterStep from "../components/letter-step";
 
 interface LetterGuidePageProps {
@@ -8,6 +10,12 @@ interface LetterGuidePageProps {
 export default function LetterGuidePage({
   nickname = "닉네임",
 }: LetterGuidePageProps) {
+  const navigate = useNavigate();
+
+  const handleSearchClick = () => {
+    navigate("/letter/search");
+  };
+
   return (
     <PageLayout
       title={
@@ -27,7 +35,9 @@ export default function LetterGuidePage({
       <p className="mt-8 text-lg text-red-200">
         앨범 커버가 대표적으로 보여요!
       </p>
-      {/** 검색창 컴포넌트 */}
+      <button type="button" onClick={handleSearchClick}>
+        <SearchInput className="mt-3" />
+      </button>
     </PageLayout>
   );
 }
