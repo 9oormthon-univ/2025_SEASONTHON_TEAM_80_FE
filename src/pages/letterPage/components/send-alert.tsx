@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { useEffect, useId, useRef, useState } from "react";
 import WarnIcon from "@/assets/ic_warn.svg?react";
 
 interface SendAlertProps {
@@ -8,7 +9,30 @@ interface SendAlertProps {
 }
 
 export function SendAlert({ isOpen, onClose, onConfirm }: SendAlertProps) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const descId = useId();
+
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!isOpen || !mounted || typeof document === "undefined") return;
+    
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    
+    document.body.style.overflow = "hidden";
+    confirmRef.current?.focus();
+    document.addEventListener("keydown", onKeyDown);
+    
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isOpen, mounted, onClose]);
+
+  if (!isOpen || !mounted || typeof document === "undefined") return null;
 
   return createPortal(
     <div
@@ -19,6 +43,10 @@ export function SendAlert({ isOpen, onClose, onConfirm }: SendAlertProps) {
       }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="보내기 확인"
+        aria-describedby={descId}
         className="relative bg-white shadow-lg"
         style={{
           width: "425px",
@@ -43,7 +71,7 @@ export function SendAlert({ isOpen, onClose, onConfirm }: SendAlertProps) {
               backgroundColor: "rgb(142 45 45 / 0.03)", // --color-red-100 3%
             }}
           />
-          <WarnIcon className="relative z-10" />
+          <WarnIcon className="relative z-10" aria-hidden="true" focusable="false" />
         </div>
 
         <div
@@ -53,6 +81,7 @@ export function SendAlert({ isOpen, onClose, onConfirm }: SendAlertProps) {
           {/* 메시지 */}
           <div className="text-center">
             <p
+              id={descId}
               className="text-gray-900 leading-relaxed"
               style={{ fontSize: "20px", marginTop: "16px" }}
             >
@@ -91,6 +120,7 @@ export function SendAlert({ isOpen, onClose, onConfirm }: SendAlertProps) {
                 borderRadius: "8px",
                 fontSize: "16px",
               }}
+              ref={confirmRef}
             >
               확인
             </button>

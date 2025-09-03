@@ -43,6 +43,8 @@ export default function LetterWritePage() {
         bottomContent={
           <NavigationButton
             active={isFormValid}
+            disabled={!isFormValid}
+            aria-disabled={!isFormValid}
             className="w-full"
             onClick={handleSendClick}
           >
@@ -69,8 +71,9 @@ export default function LetterWritePage() {
 
         <img
           src={LetterPaperBg}
-          alt="편지지 배경"
-          className="absolute bottom-[89px] z-10"
+          alt=""
+          aria-hidden="true"
+          className="absolute bottom-[89px] z-10 select-none"
         />
 
         {/* 편지지 내부 콘텐츠 영역 */}
@@ -81,7 +84,8 @@ export default function LetterWritePage() {
           </div>
           <img
             src={StampWebp}
-            alt="스탬프"
+            alt=""
+            aria-hidden="true"
             className="absolute top-2 right-[31px] z-30 h-auto w-auto mix-blend-multiply"
           />
 
@@ -102,6 +106,8 @@ export default function LetterWritePage() {
             placeholder="여기를 눌러 편지를 작성해주세요"
             value={letterContent}
             onChange={(e) => setLetterContent(e.target.value)}
+            aria-label="편지 내용"
+            name="letterContent"
           />
 
           {/* From 작성자 입력 영역 - 편지지 하단에서 20px 위 */}
@@ -120,13 +126,18 @@ export default function LetterWritePage() {
               placeholder="작성자"
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
+              aria-label="작성자"
+              name="authorName"
+              autoComplete="name"
+              required
+              maxLength={30}
               onInput={(e) => {
                 const target = e.target as HTMLInputElement;
                 const canvas = document.createElement("canvas");
                 const context = canvas.getContext("2d");
                 if (context) {
                   const computedStyle = window.getComputedStyle(target);
-                  context.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+                  context.font = `${computedStyle.fontStyle} ${computedStyle.fontVariant} ${computedStyle.fontWeight} ${computedStyle.fontSize} ${computedStyle.fontFamily}`;
                   const textWidth = context.measureText(
                     target.value || target.placeholder
                   ).width;
