@@ -20,7 +20,7 @@ export default function AppShell({ children }: PropsWithChildren) {
       className={`h-dvh overflow-hidden ${isLetterSearch ? "bg-white text-black" : "bg-[#412716] text-white"}`}
     >
       <main
-        className={`mx-auto h-full w-full max-w-[393px] bg-center bg-cover bg-no-repeat ${shouldRemovePadding ? "" : "p-4"}`}
+        className={`mx-auto h-full w-full max-w-[450px] bg-center bg-cover bg-no-repeat ${shouldRemovePadding ? "" : "p-4"}`}
         style={bgUrl ? { backgroundImage: `url(${bgUrl})` } : undefined}
       >
         {children}

@@ -1,6 +1,7 @@
 interface LetterStepProps {
   step: 1 | 2;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const COMMON_STYLES = {
@@ -32,11 +33,11 @@ const STEP_DATA = [
   },
 ] as const;
 
-export default function LetterStep({ step = 1, className }: LetterStepProps) {
+export default function LetterStep({ step = 1, className, style }: LetterStepProps) {
   const stepData = STEP_DATA[step - 1];
 
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div className={`flex flex-col items-center ${className}`} style={style}>
       <div className={COMMON_STYLES.container}>
         <div className={`${COMMON_STYLES.text} ${stepData.textPosition}`}>
           {stepData.label}

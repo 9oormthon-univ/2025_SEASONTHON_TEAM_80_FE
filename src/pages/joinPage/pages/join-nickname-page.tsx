@@ -35,7 +35,7 @@ export default function JoinNicknamePage() {
       </p>
 
       <NicknameInput 
-        className="mt-3" 
+        className="mt-8" 
         value={nickname}
         onChange={setNickname}
         maxLength={6}

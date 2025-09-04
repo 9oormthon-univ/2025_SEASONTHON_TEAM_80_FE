@@ -179,3 +179,12 @@
   --color-opacity-r100-3: rgb(142 45 45 / 0.03);
   --color-opacity-b100-10: rgb(142 45 45 / 0.1);
 }
+
+/* Dynamic padding for responsive height */
+.dynamic-padding-top {
+  padding-top: max(6.5rem, calc(6.5rem + (100vh - 690px) * 0.3));
+}
+
+.dynamic-bottom-position {
+  bottom: max(89px, calc(89px + (100vh - 660px) * 0.3));
+}

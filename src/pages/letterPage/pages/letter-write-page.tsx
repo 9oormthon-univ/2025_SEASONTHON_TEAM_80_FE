@@ -59,13 +59,17 @@ export default function LetterWritePage() {
       >
         <LetterStep
           step={2}
-          className="absolute top-0 right-0 p-4 pt-26 sm:pt-36 md:pt-40"
+          className="dynamic-padding-top absolute top-0 right-0 p-4"
         />
 
-        <SideDiskIcon className="absolute right-0 bottom-[89px]" />
+        <SideDiskIcon 
+          className="dynamic-bottom-position absolute right-0" 
+        />
 
         {/* 음악 앨범 사진 */}
-        <div className="-translate-y-[90.625px] absolute right-0 bottom-[89px] h-[108.75px] w-[108.75px] overflow-hidden rounded-md bg-gray-300">
+        <div 
+          className="-translate-y-[90.625px] dynamic-bottom-position absolute right-0 h-[108.75px] w-[108.75px] overflow-hidden rounded-md bg-gray-300"
+        >
           <img
             src="/path/to/album-image.jpg"
             alt="앨범 커버"
@@ -77,11 +81,13 @@ export default function LetterWritePage() {
           src={LetterPaperBg}
           alt=""
           aria-hidden="true"
-          className="absolute bottom-[89px] z-10 select-none"
+          className="dynamic-bottom-position absolute z-10 select-none"
         />
 
         {/* 편지지 내부 콘텐츠 영역 */}
-        <div className="absolute bottom-[89px] z-20 h-[294px] w-[294px] px-5 py-5">
+        <div 
+          className="dynamic-bottom-position absolute z-20 h-[294px] w-[294px] px-5 py-5"
+        >
           {/* To. 닉네임 - 좌측 상단 */}
           <div className="absolute top-5 left-5 font-letter text-black text-xs">
             To. 닉네임
