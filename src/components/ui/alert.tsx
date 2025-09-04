@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import WarnIcon from "@/assets/ic_warn.svg?react";
@@ -8,7 +9,7 @@ interface AlertProps {
   onConfirm: () => void;
   leftButtonText: string;
   rightButtonText: string;
-  content: React.ReactNode;
+  content: ReactNode;
 }
 
 export function Alert({
@@ -53,7 +54,7 @@ export function Alert({
       }}
     >
       <div
-        role="dialog"
+        role="alertdialog"
         aria-modal="true"
         aria-label="확인 알림"
         aria-describedby={descId}
