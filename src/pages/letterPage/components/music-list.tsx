@@ -21,11 +21,11 @@ export function MusicList({
   onToggleSelection,
 }: MusicListProps) {
   return (
-    <div className="space-y-0">
-      {songs.map((song) => (
+    <div className="space-y-0 pb-4">
+      {songs.map((song, index) => (
         <div
-          key={song.id}
-          className={`relative flex h-[70px] w-[calc(100vw)] max-w-[393px] items-center px-4 ${
+          key={`${song.id}-${index}`}
+          className={`relative flex h-[70px] w-full items-center px-4 ${
             selectedSongs.includes(song.id) ? "bg-opacity-r100-3" : ""
           }`}
         >

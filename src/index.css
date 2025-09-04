@@ -188,3 +188,48 @@
 .dynamic-bottom-position {
   bottom: max(89px, calc(89px + (100vh - 660px) * 0.3));
 }
+
+/* Star twinkling animations */
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.star-twinkle-1 {
+  animation: twinkle 1.5s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.star-twinkle-2 {
+  animation: twinkle 2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.star-twinkle-3 {
+  animation: twinkle 2.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.star-twinkle-4 {
+  animation: twinkle 1.7s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+.star-twinkle-5 {
+  animation: twinkle 2.3s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.star-twinkle-6 {
+  animation: twinkle 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.star-twinkle-7 {
+  animation: twinkle 2s ease-in-out infinite;
+  animation-delay: 0.3s;
+}

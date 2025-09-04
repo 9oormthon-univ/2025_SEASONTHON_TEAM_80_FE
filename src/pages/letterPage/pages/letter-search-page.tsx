@@ -30,6 +30,41 @@ function MusicSearchPage() {
       album_cover: "",
       streaming_url: "",
     },
+    {
+      id: "spotify_id_4",
+      song_title: "Sample Song Title",
+      artist: "Sample Artist",
+      album_cover: "",
+      streaming_url: "",
+    },
+    {
+      id: "spotify_id_5",
+      song_title: "Another Song",
+      artist: "Another Artist",
+      album_cover: "",
+      streaming_url: "",
+    },
+    {
+      id: "spotify_id_6",
+      song_title: "Third Song",
+      artist: "Third Artist",
+      album_cover: "",
+      streaming_url: "",
+    },
+    {
+      id: "spotify_id_7",
+      song_title: "Sample Song Title",
+      artist: "Sample Artist",
+      album_cover: "",
+      streaming_url: "",
+    },
+    {
+      id: "spotify_id_8",
+      song_title: "Another Song",
+      artist: "Another Artist",
+      album_cover: "",
+      streaming_url: "",
+    },
   ];
 
   const [selectedSongs, setSelectedSongs] = useState<string[]>([]);
@@ -67,17 +102,19 @@ function MusicSearchPage() {
       </div>
 
       {/* 추천 음악 섹션 (임시) */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-hidden">
         <h2 className="mb-4 px-4 font-semibold text-[16px] text-brown-200">
           추천
         </h2>
 
-        {/* 음악 리스트 */}
-        <MusicList
-          songs={sampleSongs}
-          selectedSongs={selectedSongs}
-          onToggleSelection={toggleSongSelection}
-        />
+        {/* 음악 리스트 - 스크롤 가능 */}
+        <div className="flex-1 overflow-y-auto">
+          <MusicList
+            songs={sampleSongs}
+            selectedSongs={selectedSongs}
+            onToggleSelection={toggleSongSelection}
+          />
+        </div>
       </div>
 
       {/* 하단 고정 영역 */}

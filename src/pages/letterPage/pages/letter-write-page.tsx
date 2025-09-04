@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import LetterPaperBg from "@/assets/bg_letterpaper.webp";
 import SideDiskIcon from "@/assets/ic_side_disk.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
+import { Alert } from "@/components/ui/alert";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { PageLayout } from "@/components/ui/page-layout";
-import { SendAlert } from "@/pages/letterPage/components/send-alert";
 import LetterStep from "../components/letter-step";
 
 export default function LetterWritePage() {
@@ -154,10 +154,25 @@ export default function LetterWritePage() {
         </div>
       </PageLayout>
 
-      <SendAlert
+      <Alert
         isOpen={isAlertOpen}
         onClose={handleCancel}
         onConfirm={handleConfirm}
+        leftButtonText="수정"
+        rightButtonText="전송"
+        content={
+          <>
+            새해 첫 곡과 메시지는{" "}
+            <strong>
+              한 번 보내면
+              <br />
+              다시 고칠 수 없는 특별한 기록
+            </strong>
+            이 됩니다.
+            <br />
+            보내기 전에 마지막으로 확인해 주세요.
+          </>
+        }
       />
     </>
   );
