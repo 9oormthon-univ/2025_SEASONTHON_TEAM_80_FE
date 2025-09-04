@@ -5,8 +5,9 @@ import { PageLayout } from "@/components/ui/page-layout";
 
 export default function JoinNicknamePage() {
   const [nickname, setNickname] = useState("");
-  
-  const isNicknameValid = nickname.trim().length > 0 && nickname.trim().length <= 6;
+
+  const isNicknameValid =
+    nickname.trim().length > 0 && nickname.trim().length <= 6;
 
   return (
     <PageLayout
@@ -20,8 +21,8 @@ export default function JoinNicknamePage() {
         </>
       }
       bottomContent={
-        <NavigationButton 
-          className="w-full" 
+        <NavigationButton
+          className="w-full"
           active={isNicknameValid}
           disabled={!isNicknameValid}
           aria-disabled={!isNicknameValid}
@@ -34,8 +35,8 @@ export default function JoinNicknamePage() {
         다른 사람에게 보이는 별명이에요!
       </p>
 
-      <NicknameInput 
-        className="mt-8" 
+      <NicknameInput
+        className="mt-8"
         value={nickname}
         onChange={setNickname}
         maxLength={6}

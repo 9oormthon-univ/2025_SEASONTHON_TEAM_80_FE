@@ -33,7 +33,11 @@ const STEP_DATA = [
   },
 ] as const;
 
-export default function LetterStep({ step = 1, className, style }: LetterStepProps) {
+export default function LetterStep({
+  step = 1,
+  className,
+  style,
+}: LetterStepProps) {
   const stepData = STEP_DATA[step - 1];
 
   return (

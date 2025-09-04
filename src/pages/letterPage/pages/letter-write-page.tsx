@@ -14,8 +14,8 @@ export default function LetterWritePage() {
   const [letterContent, setLetterContent] = useState("");
   const [authorName, setAuthorName] = useState("");
 
-  const isFormValid = 
-    letterContent.trim() !== "" && 
+  const isFormValid =
+    letterContent.trim() !== "" &&
     authorName.trim() !== "" &&
     letterContent.length <= 50 &&
     authorName.length <= 18;
@@ -62,14 +62,10 @@ export default function LetterWritePage() {
           className="dynamic-padding-top absolute top-0 right-0 p-4"
         />
 
-        <SideDiskIcon 
-          className="dynamic-bottom-position absolute right-0" 
-        />
+        <SideDiskIcon className="dynamic-bottom-position absolute right-0" />
 
         {/* 음악 앨범 사진 */}
-        <div 
-          className="-translate-y-[90.625px] dynamic-bottom-position absolute right-0 h-[108.75px] w-[108.75px] overflow-hidden rounded-md bg-gray-300"
-        >
+        <div className="-translate-y-[90.625px] dynamic-bottom-position absolute right-0 h-[108.75px] w-[108.75px] overflow-hidden rounded-md bg-gray-300">
           <img
             src="/path/to/album-image.jpg"
             alt="앨범 커버"
@@ -85,9 +81,7 @@ export default function LetterWritePage() {
         />
 
         {/* 편지지 내부 콘텐츠 영역 */}
-        <div 
-          className="dynamic-bottom-position absolute z-20 h-[294px] w-[294px] px-5 py-5"
-        >
+        <div className="dynamic-bottom-position absolute z-20 h-[294px] w-[294px] px-5 py-5">
           {/* To. 닉네임 - 좌측 상단 */}
           <div className="absolute top-5 left-5 font-letter text-black text-xs">
             To. 닉네임

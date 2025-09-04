@@ -12,9 +12,7 @@ export default function LetterCompletePage() {
   };
 
   return (
-    <div 
-      className="dynamic-padding-top relative flex h-full w-full flex-col min-[451px]:md:pt-48 min-[451px]:sm:pt-44"
-    >
+    <div className="dynamic-padding-top relative flex h-full w-full flex-col min-[451px]:md:pt-48 min-[451px]:sm:pt-44">
       <p className="mt-3 text-center font-primary text-[32px] text-red-200 leading-12">
         마음이 담긴 첫 곡이 <br />
         성공적으로 전송됐어요. <br />
