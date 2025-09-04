@@ -10,7 +10,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   ({ className, ...props }, ref) => {
     return (
       <div
-        className={cn("relative flex h-12 w-[360px] items-center", className)}
+        className={cn("relative flex h-12 w-[412px] items-center", className)}
       >
         <LensIcon className="pointer-events-none absolute left-4 h-[18px] w-[18px] text-gray-700" />
         <input
