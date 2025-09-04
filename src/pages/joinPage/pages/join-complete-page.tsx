@@ -14,7 +14,9 @@ export default function JoinCompletePage() {
         </>
       }
       bottomContent={
-        <NavigationButton className="w-full">다음으로</NavigationButton>
+        <NavigationButton className="w-full" active={true}>
+          다음으로
+        </NavigationButton>
       }
     >
       <img src={CDPlayerImage} alt="CD Player" className="mx-auto" />

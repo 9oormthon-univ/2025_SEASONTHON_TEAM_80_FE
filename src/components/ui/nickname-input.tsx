@@ -65,16 +65,6 @@ function NicknameInput({
         )}
         {...props}
       />
-      {/* 글자 수 표시 */}
-      <div
-        className={cn(
-          "-translate-y-1/2 absolute top-1/2 right-3 transform",
-          "text-sm",
-          hasError ? "text-[#BA3D41]" : "text-[#D9D9D9]"
-        )}
-      >
-        {inputValue.length}/6
-      </div>
     </div>
   );
 }

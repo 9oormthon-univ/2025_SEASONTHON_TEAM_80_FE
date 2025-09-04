@@ -14,7 +14,11 @@ export default function LetterWritePage() {
   const [letterContent, setLetterContent] = useState("");
   const [authorName, setAuthorName] = useState("");
 
-  const isFormValid = letterContent.trim() !== "" && authorName.trim() !== "";
+  const isFormValid = 
+    letterContent.trim() !== "" && 
+    authorName.trim() !== "" &&
+    letterContent.length <= 50 &&
+    authorName.length <= 18;
 
   const handleSendClick = () => {
     if (isFormValid) {
@@ -108,6 +112,7 @@ export default function LetterWritePage() {
             onChange={(e) => setLetterContent(e.target.value)}
             aria-label="편지 내용"
             name="letterContent"
+            maxLength={50}
           />
 
           {/* From 작성자 입력 영역 - 편지지 하단에서 20px 위 */}
@@ -130,7 +135,7 @@ export default function LetterWritePage() {
               name="authorName"
               autoComplete="name"
               required
-              maxLength={30}
+              maxLength={18}
               onInput={(e) => {
                 const target = e.target as HTMLInputElement;
                 const canvas = document.createElement("canvas");

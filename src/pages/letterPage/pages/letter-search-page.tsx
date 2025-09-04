@@ -62,6 +62,7 @@ function MusicSearchPage() {
             setSearchQuery(e.target.value)
           }
           placeholder="곡, 앨범, 아티스트 명으로 검색"
+          maxLength={50}
         />
       </div>
 
