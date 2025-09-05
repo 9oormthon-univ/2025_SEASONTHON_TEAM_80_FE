@@ -1,4 +1,5 @@
 import axios, { type AxiosError, type AxiosInstance } from "axios";
+import { handleApiError } from "./error";
 
 // 로딩 상태 관리
 let loadingCount = 0;
@@ -64,7 +65,8 @@ axiosInstance.interceptors.response.use(
     // 에러 로깅
     if (import.meta.env.DEV) {
       console.error(
-        `API Error: ${error.response?.status} ${error.config?.url}`
+        `API Error: ${error.response?.status} ${error.config?.url}`,
+        handleApiError(error)
       );
     }
 
@@ -73,11 +75,6 @@ axiosInstance.interceptors.response.use(
       if (window.location.pathname !== "/") {
         window.location.href = "/";
       }
-    }
-
-    // 403
-    if (error.response?.status === 403) {
-      console.warn("접근 권한이 없습니다.");
     }
 
     return Promise.reject(error);
