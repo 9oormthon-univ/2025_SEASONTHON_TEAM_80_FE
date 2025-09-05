@@ -1,9 +1,17 @@
 import axios, { type AxiosError, type AxiosInstance } from "axios";
+import { API_ENDPOINTS } from "./endpoints";
 import { handleApiError } from "./error";
 
 // 로딩 상태 관리
 let loadingCount = 0;
 let loadingCallback: ((isLoading: boolean) => void) | null = null;
+
+// 토큰 재발급 관리
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: unknown) => void;
+  reject: (error: unknown) => void;
+}> = [];
 
 export const setLoadingCallback = (callback: (isLoading: boolean) => void) => {
   loadingCallback = callback;
@@ -13,6 +21,19 @@ const updateLoadingState = () => {
   if (loadingCallback) {
     loadingCallback(loadingCount > 0);
   }
+};
+
+// 대기열 처리 함수
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+
+  failedQueue = [];
 };
 
 // Axios 인스턴스 생성
@@ -70,8 +91,46 @@ axiosInstance.interceptors.response.use(
       );
     }
 
-    // 401
+    // 401 에러 처리 (토큰 만료)
     if (error.response?.status === 401) {
+      const originalRequest = error.config;
+
+      if (
+        originalRequest &&
+        !originalRequest.url?.includes(API_ENDPOINTS.AUTH.REISSUE)
+      ) {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then(() => {
+              return axiosInstance.request(originalRequest);
+            })
+            .catch((err) => {
+              return Promise.reject(err);
+            });
+        }
+
+        isRefreshing = true;
+
+        return axiosInstance
+          .post(API_ENDPOINTS.AUTH.REISSUE)
+          .then(() => {
+            processQueue(null);
+            return axiosInstance.request(originalRequest);
+          })
+          .catch((refreshError) => {
+            processQueue(refreshError, null);
+            if (window.location.pathname !== "/") {
+              window.location.href = "/";
+            }
+            return Promise.reject(refreshError);
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      }
+
       if (window.location.pathname !== "/") {
         window.location.href = "/";
       }
