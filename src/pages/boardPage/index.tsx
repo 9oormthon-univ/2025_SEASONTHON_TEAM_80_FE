@@ -21,18 +21,18 @@ function BoardPage() {
 
   // original pixel positions provided by user
   const ORIGINAL_POS = [
-    { id: 1, x: 60, y: 213 },
-    { id: 2, x: 148, y: 213 },
-    { id: 3, x: 239, y: 213 },
-    { id: 4, x: 330, y: 213 },
-    { id: 5, x: 60, y: 307 },
-    { id: 6, x: 148, y: 307 },
-    { id: 7, x: 239, y: 307 },
-    { id: 8, x: 330, y: 307 },
-    { id: 9, x: 60, y: 400 },
-    { id: 10, x: 330, y: 400 },
-    { id: 11, x: 60, y: 493 },
-    { id: 12, x: 330, y: 493 },
+  { id: 1, x: 48, y: 213 },
+    { id: 2, x: 140, y: 213 },
+    { id: 3, x: 230, y: 213 },
+    { id: 4, x: 320, y: 213 },
+  { id: 5, x: 48, y: 307 },
+    { id: 6, x: 140, y: 307 },
+    { id: 7, x: 230, y: 307 },
+    { id: 8, x: 320, y: 307 },
+  { id: 9, x: 48, y: 400 },
+    { id: 10, x: 320, y: 400 },
+  { id: 11, x: 48, y: 493 },
+    { id: 12, x: 320, y: 493 },
   ];
 
   // percentages relative to the shelf wrapper
@@ -306,114 +306,7 @@ function BoardPage() {
                   </>
                 );
               })
-            : ORIGINAL_POS.map((pos) => {
-                const id = pos.id;
-                if (pos.x === POCKET_COORD.x && pos.y === POCKET_COORD.y) {
-                  return (
-                    <div
-                      key={`lucky-fallback-${id}`}
-                      style={{
-                        position: "absolute",
-                        left:
-                          pos.x + shiftPx.x + POCKET_OFFSET.x + GLOBAL_LEFT_PX,
-                        top:
-                          pos.y + shiftPx.y + POCKET_OFFSET.y + GLOBAL_DOWN_PX,
-                        width: 78,
-                        height: 78,
-                      }}
-                    >
-                      <LuckyPocketIcon
-                        style={{ width: "100%", height: "100%" }}
-                      />
-                    </div>
-                  );
-                }
-
-                if (pos.x === HAT_COORD.x && pos.y === HAT_COORD.y) {
-                  return (
-                    <div
-                      key={`hat-fallback-${id}`}
-                      style={{
-                        position: "absolute",
-                        left: pos.x + shiftPx.x + GLOBAL_LEFT_PX,
-                        top: pos.y + shiftPx.y + GLOBAL_DOWN_PX,
-                        width: 68,
-                        height: 100,
-                      }}
-                    >
-                      <HatIcon style={{ width: "100%", height: "100%" }} />
-                    </div>
-                  );
-                }
-
-                const coverOffsetPx = 6;
-                return (
-                  <>
-                    <img
-                      key={`placeholder-fallback-${id}`}
-                      aria-hidden
-                      onClick={() => {
-                        toggleMoved(id);
-                        window.setTimeout(() => setLetterOpenId(id), 120);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          toggleMoved(id);
-                          window.setTimeout(() => setLetterOpenId(id), 120);
-                        }
-                      }}
-                      alt=""
-                      src={undefined}
-                      style={{
-                        position: "absolute",
-                        left: pos.x + shiftPx.x + GLOBAL_LEFT_PX,
-                        top: pos.y + shiftPx.y + GLOBAL_DOWN_PX,
-                        width: 60,
-                        height: 60,
-                        zIndex: 20,
-                        cursor: "pointer",
-                        pointerEvents: moved[id] ? "none" : "auto",
-                        transition: "transform 120ms ease",
-                        transform: moved[id] ? "translateX(-4px)" : "none",
-                      }}
-                    />
-
-                    <button
-                      key={`cover-fallback-${id}`}
-                      type="button"
-                      aria-label={`album-cover-${id}`}
-                      onClick={() => setLetterOpenId(id)}
-                      style={{
-                        position: "absolute",
-                        left:
-                          pos.x + shiftPx.x + coverOffsetPx + GLOBAL_LEFT_PX,
-                        top: pos.y + shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx,
-                        width: 48,
-                        height: 48,
-                        padding: 0,
-                        border: "none",
-                        background: "transparent",
-                        zIndex: 10,
-                        transition: "transform 120ms ease",
-                        transform: moved[id] ? "translateX(4px)" : "none",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <img
-                        src={ObjLp}
-                        alt={`album-cover-${id}`}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
-                      />
-                    </button>
-                  </>
-                );
-              })}
+            : null}
 
           {letterOpenId !== null && (
             <div
