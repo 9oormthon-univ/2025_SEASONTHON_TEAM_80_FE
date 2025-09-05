@@ -1,5 +1,6 @@
 export const ROUTES = {
   HOME: "/",
+  BOARD: "/board",
   JOIN: {
     NICKNAME: "/join/nickname",
     COMPLETE: "/join/complete",

@@ -3,22 +3,14 @@ import { cn } from "@/lib/utils";
 
 interface LinkShareButtonProps extends React.ComponentProps<"button"> {
   className?: string;
+  label?: string;
+  Icon?: React.ComponentType<{ className?: string }>;
   children?: React.ReactNode;
 }
-
-// 링크 아이콘 컴포넌트
-const LinkIcon = ({ className }: { className?: string }) => (
-  <img
-    src="/linkIcon.svg"
-    alt="링크 아이콘"
-    className={className}
-    width="24"
-    height="24"
-  />
-);
-
 function LinkShareButton({
   className,
+  label,
+  Icon,
   children,
   ...props
 }: LinkShareButtonProps) {
@@ -26,7 +18,7 @@ function LinkShareButton({
     <button
       className={cn(
         "inline-flex items-center justify-center gap-2",
-        "h-[53px] w-full",
+        "h-[53px] w-full max-w-[450px]",
         "bg-[#8E2D2D]",
         "text-[#FFFFFF]",
         "font-bold text-[20px]",
@@ -38,8 +30,12 @@ function LinkShareButton({
       )}
       {...props}
     >
-      <span>링크 공유</span>
-      <LinkIcon className="h-[24px] w-[24px]" />
+      {children ?? (
+        <>
+          {label && <span>{label}</span>}
+          {Icon && <Icon className="h-[24px] w-[24px]" />}
+        </>
+      )}
     </button>
   );
 }
