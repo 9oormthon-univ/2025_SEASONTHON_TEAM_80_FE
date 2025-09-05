@@ -42,6 +42,7 @@ function BoardPage() {
     x: 0,
     y: 0,
   });
+  const [measured, setMeasured] = useState(false);
   const GLOBAL_DOWN_PX = 0; // removed top margin
   const GLOBAL_LEFT_PX = 0; // removed left margin
   const [timeRemaining, setTimeRemaining] = useState({
@@ -85,21 +86,22 @@ function BoardPage() {
     return () => window.clearInterval(id);
   }, []);
 
+  function computeShift() {
+    const img = shelfRef.current;
+    const wrap = shelfWrapperRef.current;
+    if (!img || !wrap) return;
+    const rect = img.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const shiftPct = 6;
+    const shiftX = Math.round((rect.width * shiftPct) / 100);
+    const shiftY = Math.round((rect.height * shiftPct) / 100);
+
+    setShiftPx({ x: shiftX, y: shiftY });
+    setMeasured(true);
+  }
+
   useEffect(() => {
-    function computeShift() {
-      const img = shelfRef.current;
-      const wrap = shelfWrapperRef.current;
-      if (!img || !wrap) return;
-      const rect = img.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-
-      const shiftPct = 6;
-      const shiftX = Math.round((rect.width * shiftPct) / 100);
-      const shiftY = Math.round((rect.height * shiftPct) / 100);
-
-      setShiftPx({ x: shiftX, y: shiftY });
-    }
-
     computeShift();
     window.addEventListener("resize", computeShift);
     return () => window.removeEventListener("resize", computeShift);
@@ -179,7 +181,7 @@ function BoardPage() {
             alt="shelf"
           />
 
-          {ORIGINAL_POS.map((orig) => {
+          {measured && ORIGINAL_POS.map((orig) => {
             const id = orig.id;
             // pocket
             if (orig.x === POCKET_COORD.x && orig.y === POCKET_COORD.y) {
@@ -237,7 +239,7 @@ function BoardPage() {
                     }
                   }}
                   alt=""
-                  src={undefined}
+                  src="undefined"
                   style={{
                     position: "absolute",
                     left: orig.x + shiftPx.x + GLOBAL_LEFT_PX,
