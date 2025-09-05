@@ -42,7 +42,6 @@ function BoardPage() {
     x: 0,
     y: 0,
   });
-  
   const GLOBAL_DOWN_PX = 0; // removed top margin
   const GLOBAL_LEFT_PX = 0; // removed left margin
   const [timeRemaining, setTimeRemaining] = useState({
