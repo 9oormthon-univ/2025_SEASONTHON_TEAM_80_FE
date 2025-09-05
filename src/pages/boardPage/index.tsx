@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import BgLetter from "@/assets/bg_letterpaper.webp";
 import ShelfBg from "@/assets/bg_shelf.webp";
 import BoardNoteIcon from "@/assets/ic_board_note.svg?react";
 import HamburgerIcon from "@/assets/ic_hamburger.svg?react";
@@ -6,6 +7,7 @@ import HatIcon from "@/assets/ic_hat.svg?react";
 import HeaderIcon from "@/assets/ic_header_logo.svg?react";
 import LinkIcon from "@/assets/ic_link.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
+import StampWebp from "@/assets/ic_stamp.webp";
 import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
@@ -14,6 +16,7 @@ function BoardPage() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const shelfRef = useRef<HTMLImageElement | null>(null);
   const shelfWrapperRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
 
   // original pixel positions provided by user
   const ORIGINAL_POS = [
@@ -52,6 +55,7 @@ function BoardPage() {
     s: 0,
   });
   const [moved, setMoved] = useState<Record<number, boolean>>({});
+  const [letterOpenId, setLetterOpenId] = useState<number | null>(null);
 
   function toggleMoved(index: number) {
     setMoved((prev) => ({ ...prev, [index]: !prev[index] }));
@@ -117,6 +121,13 @@ function BoardPage() {
     window.addEventListener("resize", computePercents);
     return () => window.removeEventListener("resize", computePercents);
   }, []);
+
+  useEffect(() => {
+    if (letterOpenId !== null) {
+      // focus overlay so keyboard events (Escape) are captured
+      overlayRef.current?.focus();
+    }
+  }, [letterOpenId]);
 
   return (
     <div className="relative flex min-h-screen flex-col pb-[77px]">
@@ -225,9 +236,16 @@ function BoardPage() {
                     <img
                       key={`placeholder-${id}`}
                       aria-hidden
-                      onClick={() => toggleMoved(id)}
+                      onClick={() => {
+                        toggleMoved(id);
+                        window.setTimeout(() => setLetterOpenId(id), 120);
+                      }}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") toggleMoved(id);
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleMoved(id);
+                          window.setTimeout(() => setLetterOpenId(id), 120);
+                        }
                       }}
                       alt=""
                       src={undefined}
@@ -239,26 +257,43 @@ function BoardPage() {
                         height: 60,
                         zIndex: 20,
                         cursor: "pointer",
+                        pointerEvents: moved[id] ? "none" : "auto",
                         transition: "transform 120ms ease",
                         transform: moved[id] ? "translateX(-8px)" : "none",
                       }}
                     />
-                    <img
+
+                    <button
                       key={`cover-${id}`}
-                      src={ObjLp}
-                      alt={`album-cover-${id}`}
+                      type="button"
+                      aria-label={`album-cover-${id}`}
+                      onClick={() => setLetterOpenId(id)}
                       style={{
                         position: "absolute",
                         left: `calc(${p.leftPct}% + ${shiftPx.x + coverOffsetPx + 2}px)`,
                         top: `calc(${p.topPct}% + ${shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx}px)`,
                         width: 48,
                         height: 48,
-                        objectFit: "cover",
+                        padding: 0,
+                        border: "none",
+                        background: "transparent",
                         zIndex: 10,
                         transition: "transform 120ms ease",
                         transform: moved[id] ? "translateX(4px)" : "none",
+                        cursor: "pointer",
                       }}
-                    />
+                    >
+                      <img
+                        src={ObjLp}
+                        alt={`album-cover-${id}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                      />
+                    </button>
                   </>
                 );
               })
@@ -308,9 +343,16 @@ function BoardPage() {
                     <img
                       key={`placeholder-fallback-${id}`}
                       aria-hidden
-                      onClick={() => toggleMoved(id)}
+                      onClick={() => {
+                        toggleMoved(id);
+                        window.setTimeout(() => setLetterOpenId(id), 120);
+                      }}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") toggleMoved(id);
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleMoved(id);
+                          window.setTimeout(() => setLetterOpenId(id), 120);
+                        }
                       }}
                       alt=""
                       src={undefined}
@@ -322,14 +364,17 @@ function BoardPage() {
                         height: 60,
                         zIndex: 20,
                         cursor: "pointer",
+                        pointerEvents: moved[id] ? "none" : "auto",
                         transition: "transform 120ms ease",
                         transform: moved[id] ? "translateX(-4px)" : "none",
                       }}
                     />
-                    <img
+
+                    <button
                       key={`cover-fallback-${id}`}
-                      src={ObjLp}
-                      alt={`album-cover-${id}`}
+                      type="button"
+                      aria-label={`album-cover-${id}`}
+                      onClick={() => setLetterOpenId(id)}
                       style={{
                         position: "absolute",
                         left:
@@ -337,15 +382,155 @@ function BoardPage() {
                         top: pos.y + shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx,
                         width: 48,
                         height: 48,
-                        objectFit: "cover",
+                        padding: 0,
+                        border: "none",
+                        background: "transparent",
                         zIndex: 10,
                         transition: "transform 120ms ease",
                         transform: moved[id] ? "translateX(4px)" : "none",
+                        cursor: "pointer",
                       }}
-                    />
+                    >
+                      <img
+                        src={ObjLp}
+                        alt={`album-cover-${id}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                      />
+                    </button>
                   </>
                 );
               })}
+
+          {letterOpenId !== null && (
+            <div
+              ref={overlayRef}
+              role="dialog"
+              aria-modal="true"
+              tabIndex={-1}
+              onClick={() => setLetterOpenId(null)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setLetterOpenId(null);
+              }}
+              style={{
+                position: "fixed",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(0,0,0,0.4)",
+                zIndex: 1000,
+              }}
+            >
+              <div
+                role="document"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                style={{
+                  position: "relative",
+                  width: 336,
+                  height: 336,
+                  backgroundImage: `url(${BgLetter})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  borderRadius: 8,
+                  overflow: "hidden",
+                }}
+              >
+                {/* To. label at top-left: 23px from top and left */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    top: 23,
+                    left: 23,
+                    fontSize: 14,
+                    color: "#000",
+                  }}
+                  className="font-letter"
+                >
+                  To. 최대여섯글자
+                </div>
+                {/* read-only display box below the To. label: 294x225, font-letter 17px */}
+                <div
+                  className="font-letter"
+                  style={{
+                    position: "absolute",
+                    top: 46,
+                    left: 23,
+                    width: 294,
+                    height: 225,
+                    fontSize: 17,
+                    background: "transparent",
+                    color: "#000",
+                    lineHeight: "1.2",
+                    overflow: "auto",
+                    whiteSpace: "pre-wrap",
+                    WebkitLineBreak: "anywhere",
+                    paddingRight: 8,
+                  }}
+                >
+                  {`안녕하세요.
+새해 복 많이 받으세요.
+올 한 해도 건강하시고 행복하세요.
+이 편지는 테스트용으로 여러 줄을 채워서 스크롤이 필요한지 확인합니다.
+더 많은 텍스트를 넣어 스크롤을 확인해 주세요.
+감사합니다.
+테스트 라인 1
+테스트 라인 2
+테스트 라인 3
+테스트 라인 4`}
+                </div>
+
+                {/* From. label placed below the scrollable area */}
+                <div
+                  aria-hidden
+                  className="font-letter"
+                  style={{
+                    position: "absolute",
+                    top: 277,
+                    left: 23,
+                    fontSize: 14,
+                    color: "#000",
+                  }}
+                >
+                  From. 여섯글자
+                </div>
+                <img
+                  src={ObjLp}
+                  alt={`album-${letterOpenId ?? ""}`}
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    top: 23,
+                    right: 23,
+                    width: 30,
+                    height: 30,
+                    objectFit: "cover",
+                    borderRadius: 4,
+                  }}
+                />
+
+                <img
+                  src={StampWebp}
+                  alt="stamp"
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    top: 9,
+                    right: 36,
+                    width: 95,
+                    height: 37,
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
         <div className="mb-24">
           <Pagination totalPages={10} />
