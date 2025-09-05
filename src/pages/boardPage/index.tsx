@@ -8,6 +8,7 @@ import HeaderIcon from "@/assets/ic_header_logo.svg?react";
 import LinkIcon from "@/assets/ic_link.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
+import FrameImg from "@/assets/ic_frame.webp";
 import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
@@ -135,6 +136,14 @@ function BoardPage() {
         <HeaderIcon />
       </div>
       <HamburgerIcon className="absolute top-[20px] right-[20px]" />
+
+      {/* decorative frame image: top 99px, flush left */}
+      <img
+        src={FrameImg}
+        alt=""
+        aria-hidden
+        style={{ position: "absolute", top: 99, left: 0 }}
+      />
 
       {/* fixed-server countdown to next Jan 1 */}
       <div
