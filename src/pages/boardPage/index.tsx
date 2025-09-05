@@ -42,7 +42,7 @@ function BoardPage() {
     x: 0,
     y: 0,
   });
-  const [measured, setMeasured] = useState(false);
+  
   const GLOBAL_DOWN_PX = 0; // removed top margin
   const GLOBAL_LEFT_PX = 0; // removed left margin
   const [timeRemaining, setTimeRemaining] = useState({
@@ -97,8 +97,7 @@ function BoardPage() {
     const shiftX = Math.round((rect.width * shiftPct) / 100);
     const shiftY = Math.round((rect.height * shiftPct) / 100);
 
-    setShiftPx({ x: shiftX, y: shiftY });
-    setMeasured(true);
+  setShiftPx({ x: shiftX, y: shiftY });
   }
 
   useEffect(() => {
@@ -177,11 +176,12 @@ function BoardPage() {
           <img
             ref={shelfRef}
             src={ShelfBg}
+            onLoad={computeShift}
             className="block h-auto max-w-full"
             alt="shelf"
           />
 
-          {measured && ORIGINAL_POS.map((orig) => {
+          {ORIGINAL_POS.map((orig) => {
             const id = orig.id;
             // pocket
             if (orig.x === POCKET_COORD.x && orig.y === POCKET_COORD.y) {
@@ -239,14 +239,14 @@ function BoardPage() {
                     }
                   }}
                   alt=""
-                  src="undefined"
+                  src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
                   style={{
                     position: "absolute",
                     left: orig.x + shiftPx.x + GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + GLOBAL_DOWN_PX,
                     width: 60,
                     height: 60,
-                    zIndex: 20,
+                    zIndex: 10,
                     cursor: "pointer",
                     pointerEvents: moved[id] ? "none" : "auto",
                     transition: "transform 120ms ease",
@@ -268,7 +268,7 @@ function BoardPage() {
                     padding: 0,
                     border: "none",
                     background: "transparent",
-                    zIndex: 10,
+                    zIndex: 20,
                     transition: "transform 120ms ease",
                     transform: moved[id] ? "translateX(4px)" : "none",
                     cursor: "pointer",
