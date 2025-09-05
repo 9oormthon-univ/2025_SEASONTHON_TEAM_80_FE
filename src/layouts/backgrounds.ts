@@ -1,3 +1,4 @@
+import bgBoard from "@/assets/bg_board.webp";
 import bgLanding from "@/assets/bg_landing.webp";
 import bgPaper from "@/assets/bg_paper.webp";
 import bgPaperLP from "@/assets/bg_paper_lp.webp";
@@ -10,4 +11,5 @@ export const routeBg: Record<string, string> = {
   "/letter/select": bgPaperLP,
   "/letter/write": bgPaper,
   "/letter/complete": bgPaper,
+  "/board": bgBoard,
 };
