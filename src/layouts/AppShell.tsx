@@ -13,7 +13,9 @@ export default function AppShell({ children }: PropsWithChildren) {
 
   const isLetterSearch = pathname === "/letter/search";
   const isLetterWrite = pathname === "/letter/write";
-  const shouldRemovePadding = isLetterSearch || isLetterWrite;
+  const isErrorPage =
+    !routeBg[pathname] && pathname !== "/letter/search" && pathname !== "/";
+  const shouldRemovePadding = isLetterSearch || isLetterWrite || isErrorPage;
 
   return (
     <div

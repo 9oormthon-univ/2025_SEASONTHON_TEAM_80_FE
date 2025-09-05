@@ -1,3 +1,4 @@
+export { default as ErrorPage } from "./errorPage";
 export { default as JoinCompletePage } from "./joinPage/pages/join-complete-page";
 export { default as JoinNicknamePage } from "./joinPage/pages/join-nickname-page";
 export { default as LetterCompletePage } from "./letterPage/pages/letter-complete-page";

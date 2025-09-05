@@ -4,6 +4,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AppShell from "./layouts/AppShell";
 import { queryClient } from "./lib/query-client";
 import {
+  ErrorPage,
   JoinCompletePage,
   JoinNicknamePage,
   LetterCompletePage,
@@ -28,6 +29,7 @@ function App() {
             <Route path="/letter/select" element={<LetterSelectPage />} />
             <Route path="/letter/write" element={<LetterWritePage />} />
             <Route path="/letter/complete" element={<LetterCompletePage />} />
+            <Route path="*" element={<ErrorPage />} />
           </Routes>
         </AppShell>
       </Router>
