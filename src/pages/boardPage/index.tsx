@@ -19,36 +19,33 @@ function BoardPage() {
   const shelfWrapperRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  // original pixel positions provided by user
+  // original pixel positions adjusted towards top-left with reduced top margin
   const ORIGINAL_POS = [
-  { id: 1, x: 48, y: 213 },
-    { id: 2, x: 140, y: 213 },
-    { id: 3, x: 230, y: 213 },
-    { id: 4, x: 320, y: 213 },
-  { id: 5, x: 48, y: 307 },
-    { id: 6, x: 140, y: 307 },
-    { id: 7, x: 230, y: 307 },
-    { id: 8, x: 320, y: 307 },
-  { id: 9, x: 48, y: 400 },
-    { id: 10, x: 320, y: 400 },
-  { id: 11, x: 48, y: 493 },
-    { id: 12, x: 320, y: 493 },
+  { id: 1, x: 0, y: 10 },
+    { id: 2, x: 85, y: 10 },
+    { id: 3, x: 175, y: 10 },
+    { id: 4, x: 265, y: 10 },
+  { id: 5, x: 0, y: 102 },
+    { id: 6, x: 85, y: 102 },
+    { id: 7, x: 175, y: 102 },
+    { id: 8, x: 265, y: 102 },
+  { id: 9, x: 0, y: 200 },
+    { id: 10, x: 265, y: 200 },
+  { id: 11, x: 0, y: 290 },
+    { id: 12, x: 265, y: 290 },
   ];
 
-  // percentages relative to the shelf wrapper
-  const [percents, setPercents] = useState<
-    { leftPct: number; topPct: number }[] | null
-  >(null);
-
-  const POCKET_COORD = { x: 239, y: 213 };
-  const HAT_COORD = { x: 60, y: 307 };
+  const POCKET_COORD = { x: 190, y: 120 }; // adjusted for reduced top margin
+  const HAT_COORD = { x: 10, y: 200 }; // adjusted for reduced top margin
   const POCKET_OFFSET = { x: -8, y: 0 };
   const [shiftPx, setShiftPx] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
   });
-  const GLOBAL_DOWN_PX = 12;
-  const GLOBAL_LEFT_PX = -2; // move all positioned elements left by 2px
+
+  const [measured, setMeasured] = useState(false);
+  const GLOBAL_DOWN_PX = 0; // removed top margin
+  const GLOBAL_LEFT_PX = 0; // removed left margin
   const [timeRemaining, setTimeRemaining] = useState({
     d: 0,
     h: 0,
@@ -90,37 +87,25 @@ function BoardPage() {
     return () => window.clearInterval(id);
   }, []);
 
+  function computeShift() {
+    const img = shelfRef.current;
+    const wrap = shelfWrapperRef.current;
+    if (!img || !wrap) return;
+    const rect = img.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const shiftPct = 6;
+    const shiftX = Math.round((rect.width * shiftPct) / 100);
+    const shiftY = Math.round((rect.height * shiftPct) / 100);
+
+    setShiftPx({ x: shiftX, y: shiftY });
+    setMeasured(true);
+  }
+
   useEffect(() => {
-    function computePercents() {
-      const img = shelfRef.current;
-      const wrap = shelfWrapperRef.current;
-      if (!img || !wrap) return;
-      const rect = img.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-
-      const raw = ORIGINAL_POS.map((pos) => ({
-        leftPct: (pos.x / rect.width) * 100,
-        topPct: (pos.y / rect.height) * 100,
-      }));
-
-      const minLeft = Math.min(...raw.map((r) => r.leftPct));
-      const minTop = Math.min(...raw.map((r) => r.topPct));
-      const adjusted = raw.map((r) => ({
-        leftPct: r.leftPct - minLeft,
-        topPct: r.topPct - minTop,
-      }));
-
-      const shiftPct = 6; // percent of shelf dimension to shift by
-      const shiftX = Math.round((rect.width * shiftPct) / 100);
-      const shiftY = Math.round((rect.height * shiftPct) / 100);
-
-      setPercents(adjusted);
-      setShiftPx({ x: shiftX, y: shiftY });
-    }
-
-    computePercents();
-    window.addEventListener("resize", computePercents);
-    return () => window.removeEventListener("resize", computePercents);
+    computeShift();
+    window.addEventListener("resize", computeShift);
+    return () => window.removeEventListener("resize", computeShift);
   }, []);
 
   useEffect(() => {
@@ -197,116 +182,113 @@ function BoardPage() {
             alt="shelf"
           />
 
-          {percents
-            ? percents.map((p, i) => {
-                const orig = ORIGINAL_POS[i];
-                const id = orig.id;
-                // pocket
-                if (orig.x === POCKET_COORD.x && orig.y === POCKET_COORD.y) {
-                  return (
-                    <div
-                      key={`lucky-${id}`}
-                      style={{
-                        position: "absolute",
-                        left: `calc(${p.leftPct}% + ${shiftPx.x + POCKET_OFFSET.x - 3}px)`,
-                        top: `calc(${p.topPct}% + ${shiftPx.y + POCKET_OFFSET.y + GLOBAL_DOWN_PX}px)`,
-                        width: 78,
-                        height: 78,
-                      }}
-                    >
-                      <LuckyPocketIcon
-                        style={{ width: "100%", height: "100%" }}
-                      />
-                    </div>
-                  );
-                }
+          {measured && ORIGINAL_POS.map((orig) => {
+            const id = orig.id;
+            // pocket
+            if (orig.x === POCKET_COORD.x && orig.y === POCKET_COORD.y) {
+              return (
+                <div
+                  key={`lucky-${id}`}
+                  style={{
+                    position: "absolute",
+                    left: orig.x + shiftPx.x + POCKET_OFFSET.x - 3 + GLOBAL_LEFT_PX,
+                    top: orig.y + shiftPx.y + POCKET_OFFSET.y + GLOBAL_DOWN_PX,
+                    width: 78,
+                    height: 78,
+                  }}
+                >
+                  <LuckyPocketIcon
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </div>
+              );
+            }
 
-                // hat
-                if (orig.x === HAT_COORD.x && orig.y === HAT_COORD.y) {
-                  return (
-                    <div
-                      key={`hat-${id}`}
-                      style={{
-                        position: "absolute",
-                        left: `calc(${p.leftPct}% + ${shiftPx.x + GLOBAL_LEFT_PX}px)`,
-                        top: `calc(${p.topPct}% + ${shiftPx.y + GLOBAL_DOWN_PX}px)`,
-                        width: 68,
-                        height: 100,
-                      }}
-                    >
-                      <HatIcon style={{ width: "100%", height: "100%" }} />
-                    </div>
-                  );
-                }
+            // hat
+            if (orig.x === HAT_COORD.x && orig.y === HAT_COORD.y) {
+              return (
+                <div
+                  key={`hat-${id}`}
+                  style={{
+                    position: "absolute",
+                    left: orig.x + shiftPx.x + GLOBAL_LEFT_PX,
+                    top: orig.y + shiftPx.y + GLOBAL_DOWN_PX,
+                    width: 68,
+                    height: 100,
+                  }}
+                >
+                  <HatIcon style={{ width: "100%", height: "100%" }} />
+                </div>
+              );
+            }
 
-                const coverOffsetPx = 6;
-                return (
-                  <>
-                    <img
-                      key={`placeholder-${id}`}
-                      aria-hidden
-                      onClick={() => {
-                        toggleMoved(id);
-                        window.setTimeout(() => setLetterOpenId(id), 120);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          toggleMoved(id);
-                          window.setTimeout(() => setLetterOpenId(id), 120);
-                        }
-                      }}
-                      alt=""
-                      src={undefined}
-                      style={{
-                        position: "absolute",
-                        left: `calc(${p.leftPct}% + ${shiftPx.x + GLOBAL_LEFT_PX}px)`,
-                        top: `calc(${p.topPct}% + ${shiftPx.y + GLOBAL_DOWN_PX}px)`,
-                        width: 60,
-                        height: 60,
-                        zIndex: 20,
-                        cursor: "pointer",
-                        pointerEvents: moved[id] ? "none" : "auto",
-                        transition: "transform 120ms ease",
-                        transform: moved[id] ? "translateX(-8px)" : "none",
-                      }}
-                    />
+            const coverOffsetPx = 6;
+            return (
+              <>
+                <img
+                  key={`placeholder-${id}`}
+                  aria-hidden
+                  onClick={() => {
+                    toggleMoved(id);
+                    window.setTimeout(() => setLetterOpenId(id), 120);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleMoved(id);
+                      window.setTimeout(() => setLetterOpenId(id), 120);
+                    }
+                  }}
+                  alt=""
+                  src="undefined"
+                  style={{
+                    position: "absolute",
+                    left: orig.x + shiftPx.x + GLOBAL_LEFT_PX,
+                    top: orig.y + shiftPx.y + GLOBAL_DOWN_PX,
+                    width: 60,
+                    height: 60,
+                    zIndex: 20,
+                    cursor: "pointer",
+                    pointerEvents: moved[id] ? "none" : "auto",
+                    transition: "transform 120ms ease",
+                    transform: moved[id] ? "translateX(-8px)" : "none",
+                  }}
+                />
 
-                    <button
-                      key={`cover-${id}`}
-                      type="button"
-                      aria-label={`album-cover-${id}`}
-                      onClick={() => setLetterOpenId(id)}
-                      style={{
-                        position: "absolute",
-                        left: `calc(${p.leftPct}% + ${shiftPx.x + coverOffsetPx + 2}px)`,
-                        top: `calc(${p.topPct}% + ${shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx}px)`,
-                        width: 48,
-                        height: 48,
-                        padding: 0,
-                        border: "none",
-                        background: "transparent",
-                        zIndex: 10,
-                        transition: "transform 120ms ease",
-                        transform: moved[id] ? "translateX(4px)" : "none",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <img
-                        src={ObjLp}
-                        alt={`album-cover-${id}`}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
-                      />
-                    </button>
-                  </>
-                );
-              })
-            : null}
+                <button
+                  key={`cover-${id}`}
+                  type="button"
+                  aria-label={`album-cover-${id}`}
+                  onClick={() => setLetterOpenId(id)}
+                  style={{
+                    position: "absolute",
+                    left: orig.x + shiftPx.x + coverOffsetPx + 2 + GLOBAL_LEFT_PX,
+                    top: orig.y + shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx,
+                    width: 48,
+                    height: 48,
+                    padding: 0,
+                    border: "none",
+                    background: "transparent",
+                    zIndex: 10,
+                    transition: "transform 120ms ease",
+                    transform: moved[id] ? "translateX(4px)" : "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <img
+                    src={ObjLp}
+                    alt={`album-cover-${id}`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                </button>
+              </>
+            );
+          })}
 
           {letterOpenId !== null && (
             <div
