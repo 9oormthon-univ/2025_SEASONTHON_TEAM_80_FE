@@ -20,6 +20,8 @@ export default function LetterSelectPage({
   const { shareUri } = useParams();
   const location = useLocation();
   const [recipientNickname, setRecipientNickname] = useState(nickname);
+  // local song loaded from search draft if `song` prop isn't provided
+  const [localSong, setLocalSong] = useState<Song | undefined>(song);
 
   const isJoinPage = location.pathname.startsWith("/join/");
   const isFirstTimeJoin = location.pathname === "/join/letter/select";
@@ -37,6 +39,41 @@ export default function LetterSelectPage({
 
     fetchBoardInfo();
   }, [shareUri]);
+
+  useEffect(() => {
+    // prefer prop `song` if provided
+    if (song) {
+      setLocalSong(song);
+      return;
+    }
+
+    try {
+      const raw = localStorage.getItem("messageDraft");
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      
+      console.log("localStorage data:", parsed); // 디버그용
+      
+      const mapped: Song = {
+        // mapping from localStorage data structure
+        songId: (parsed.songId as string) ?? "",
+        songTitle: (parsed.songTitle as string) ?? "",
+        artist: (parsed.artist as string) ?? "",
+        coverImage: (parsed.albumImageUrl as string) ?? "",
+        streamingUrl: (parsed.songUrl as string) ?? "",
+        prestreamingUrl: (parsed.prestreamingUrl as string) ?? "",
+      };
+
+      console.log("mapped song:", mapped); // 디버그용
+      setLocalSong(mapped);
+    } catch (err) {
+      // ignore malformed data
+      // eslint-disable-next-line no-console
+      console.warn("Failed to parse messageDraft from localStorage:", err);
+    }
+  }, [song]);
+
+  const displayedSong = localSong ?? song;
 
   const handleClick = () => {
     if (isJoinPage) {
@@ -86,11 +123,11 @@ export default function LetterSelectPage({
 
       <div className="mx-auto flex w-60 flex-col gap-4">
         <div className="relative flex h-60 w-60 items-center justify-center self-center rounded bg-white/10 backdrop-blur-md">
-          {song?.coverImage ? (
+          {displayedSong?.coverImage ? (
             <img
               aria-label="album-cover"
               className="h-52 w-52"
-              src={song.coverImage}
+              src={displayedSong.coverImage}
             />
           ) : (
             <div className="h-52 w-52 rounded bg-gray-500" />
@@ -100,9 +137,9 @@ export default function LetterSelectPage({
         <div className="flex flex-row gap-2">
           <div className="flex flex-1 flex-row items-center gap-1 rounded-md bg-white/10 px-4 py-3 backdrop-blur-md">
             <p className="text-base text-white">
-              {song?.coverImage || "곡 제목"}
+              {displayedSong?.songTitle || "곡 제목"}
             </p>
-            <p className="text-gray-500 text-xs">{song?.artist || "가수"}</p>
+            <p className="text-gray-500 text-xs">{displayedSong?.artist || "가수"}</p>
           </div>
 
           <button
@@ -114,11 +151,11 @@ export default function LetterSelectPage({
         </div>
       </div>
 
-      {song?.coverImage ? (
+      {displayedSong?.coverImage ? (
         <img
           aria-label="album-cover"
           className="-translate-x-1/2 -bottom-22 absolute left-1/2 z-0 h-44 w-44 transform"
-          src={song.coverImage}
+          src={displayedSong.coverImage}
         />
       ) : (
         <div className="-translate-x-1/2 -bottom-20 absolute left-1/2 h-40 w-40 transform bg-gray-500" />
