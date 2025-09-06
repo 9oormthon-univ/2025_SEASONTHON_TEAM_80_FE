@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getBoardShare, getSharedBoard } from "@/apis/board";
+import { getBoardList, getBoardShare, getSharedBoard } from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
 import ShelfBg from "@/assets/bg_shelf.webp";
 import BoardNoteIcon from "@/assets/ic_board_note.svg?react";
@@ -11,11 +11,14 @@ import HatIcon from "@/assets/ic_hat.svg?react";
 import HeaderIcon from "@/assets/ic_header_logo.svg?react";
 import LinkIcon from "@/assets/ic_link.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
+import PlayIcon from "@/assets/ic_play.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
 import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
 import { Sidebar } from "@/components/ui/sidebar";
+import type { BoardListItem, SharedBoardMessage } from "@/types/board";
+import type { Song } from "@/types/song";
 
 function BoardPage() {
   const { shareUri } = useParams();
@@ -29,10 +32,13 @@ function BoardPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [ownerNickname, setOwnerNickname] = useState<string>("닉네임");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [boardList, setBoardList] = useState<BoardListItem[]>([]);
+  const [boardTotalElements, setBoardTotalElements] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const { data: sharedBoardData } = useQuery({
     queryKey: ["sharedBoard", shareUri, currentPage],
-    queryFn: () => getSharedBoard(shareUri!, currentPage, 10),
+    queryFn: () => getSharedBoard(shareUri ?? "", currentPage, 10),
     enabled: isSharedBoard && Boolean(shareUri),
   });
 
@@ -41,6 +47,36 @@ function BoardPage() {
     queryFn: () => getBoardShare(),
     enabled: !isSharedBoard,
   });
+
+  // fetch current user's board list (paginated) when not viewing a shared board
+  useEffect(() => {
+    let mounted = true;
+    if (!isSharedBoard) {
+      (async () => {
+        try {
+          const res = await getBoardList(currentPage, 10, "desc");
+          if (!mounted) return;
+          // API returns wrapper { success, code, message, data }
+          const data = res.data;
+          setBoardList(data.content ?? []);
+          setBoardTotalElements(
+            data.totalElements ?? data.content?.length ?? 0
+          );
+          setTotalPages(data.totalPages ?? 1);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error("Failed to load board list", err);
+          setBoardList([]);
+          setBoardTotalElements(0);
+          setTotalPages(1);
+        }
+      })();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [isSharedBoard, currentPage]);
 
   useEffect(() => {
     if (isSharedBoard && sharedBoardData?.nickname) {
@@ -78,12 +114,10 @@ function BoardPage() {
     m: 0,
     s: 0,
   });
-  const [moved, setMoved] = useState<Record<number, boolean>>({});
   const [letterOpenId, setLetterOpenId] = useState<number | null>(null);
-
-  function toggleMoved(index: number) {
-    setMoved((prev) => ({ ...prev, [index]: !prev[index] }));
-  }
+  const [messageDetail, setMessageDetail] = useState<
+    import("@/types/board").BoardMessageData | null
+  >(null);
 
   useEffect(() => {
     // use a fixed server time as requested
@@ -139,6 +173,41 @@ function BoardPage() {
       overlayRef.current?.focus();
     }
   }, [letterOpenId]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (letterOpenId === null) {
+        setMessageDetail(null);
+        return;
+      }
+
+      // determine messageId from current data (shared or boardList)
+      const posIndex = letterOpenId - 1;
+      const sharedContent = sharedBoardData?.content ?? [];
+      const possible = isSharedBoard
+        ? sharedContent[posIndex]
+        : boardList[posIndex];
+      const messageId = possible?.messageId;
+      if (!messageId) return;
+
+      try {
+        const res = await (await import("@/apis/board")).getBoardDetail(
+          messageId
+        );
+        if (!mounted) return;
+        setMessageDetail(res.data ?? null);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to load message detail", err);
+        setMessageDetail(null);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [letterOpenId, isSharedBoard, boardList, sharedBoardData]);
 
   return (
     <div className="relative flex min-h-screen flex-col pb-[77px]">
@@ -258,20 +327,29 @@ function BoardPage() {
             }
 
             const coverOffsetPx = 6;
+
+            // choose item for this slot depending on board type
+            const sharedContent = sharedBoardData?.content ?? [];
+            const item = isSharedBoard
+              ? sharedContent[id - 1]
+              : boardList[id - 1];
+
+            // if there is no item for this slot, render nothing
+            if (!item) return null;
+
             return (
-              <>
+              <div
+                key={`slot-${id}`}
+                style={{ position: "absolute", left: 0, top: 0 }}
+              >
                 <img
                   key={`placeholder-${id}`}
                   aria-hidden
-                  onClick={() => {
-                    toggleMoved(id);
-                    window.setTimeout(() => setLetterOpenId(id), 120);
-                  }}
+                  onClick={() => setLetterOpenId(id)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      toggleMoved(id);
-                      window.setTimeout(() => setLetterOpenId(id), 120);
+                      setLetterOpenId(id);
                     }
                   }}
                   alt=""
@@ -284,9 +362,8 @@ function BoardPage() {
                     height: 60,
                     zIndex: 10,
                     cursor: "pointer",
-                    pointerEvents: moved[id] ? "none" : "auto",
                     transition: "transform 120ms ease",
-                    transform: moved[id] ? "translateX(-8px)" : "none",
+                    transform: "none",
                   }}
                 />
 
@@ -307,22 +384,43 @@ function BoardPage() {
                     background: "transparent",
                     zIndex: 20,
                     transition: "transform 120ms ease",
-                    transform: moved[id] ? "translateX(4px)" : "none",
+                    transform: "none",
                     cursor: "pointer",
                   }}
                 >
-                  <img
-                    src={ObjLp}
-                    alt={`album-cover-${id}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
+                  {isSharedBoard
+                    ? (() => {
+                        const sharedItem = item as SharedBoardMessage;
+                        return (
+                          <img
+                            src={sharedItem.albumCoverUrl}
+                            alt={`album-cover-${sharedItem.messageId}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              display: "block",
+                            }}
+                          />
+                        );
+                      })()
+                    : (() => {
+                        const boardItem = item as BoardListItem;
+                        return (
+                          <img
+                            src={boardItem.coverImageUrl}
+                            alt={`album-cover-${boardItem.messageId}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              display: "block",
+                            }}
+                          />
+                        );
+                      })()}
                 </button>
-              </>
+              </div>
             );
           })}
 
@@ -340,18 +438,48 @@ function BoardPage() {
                 position: "fixed",
                 inset: 0,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
+                gap: 16,
                 background: "rgba(0,0,0,0.4)",
                 zIndex: 1000,
               }}
             >
+              {/* ObjLp wrapper placed behind the letter modal, moved up and lowered z-index */}
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "calc(50% - 300px)",
+                  transform: "translateX(-50%)",
+                  width: 200,
+                  height: 200,
+                  zIndex: 800,
+                  pointerEvents: "none",
+                }}
+              >
+                <img
+                  src={ObjLp}
+                  alt="obj-lp"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                    borderRadius: 8,
+                  }}
+                />
+              </div>
+
               <div
                 role="document"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 style={{
                   position: "relative",
+                  zIndex: 1001,
                   width: 336,
                   height: 336,
                   backgroundImage: `url(${BgLetter})`,
@@ -394,16 +522,13 @@ function BoardPage() {
                     paddingRight: 8,
                   }}
                 >
-                  {`안녕하세요.
-새해 복 많이 받으세요.
-올 한 해도 건강하시고 행복하세요.
-이 편지는 테스트용으로 여러 줄을 채워서 스크롤이 필요한지 확인합니다.
-더 많은 텍스트를 넣어 스크롤을 확인해 주세요.
-감사합니다.
-테스트 라인 1
-테스트 라인 2
-테스트 라인 3
-테스트 라인 4`}
+                  {messageDetail ? (
+                    <div style={{ marginBottom: 8 }}>
+                      {messageDetail.content}
+                    </div>
+                  ) : (
+                    <div>로딩 중...</div>
+                  )}
                 </div>
 
                 {/* From. label placed below the scrollable area */}
@@ -420,20 +545,37 @@ function BoardPage() {
                 >
                   From. 여섯글자
                 </div>
-                <img
-                  src={ObjLp}
-                  alt={`album-${letterOpenId ?? ""}`}
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    top: 23,
-                    right: 23,
-                    width: 30,
-                    height: 30,
-                    objectFit: "cover",
-                    borderRadius: 4,
-                  }}
-                />
+                {messageDetail?.coverImageUrl ? (
+                  <img
+                    src={messageDetail.coverImageUrl}
+                    alt={`album-${letterOpenId ?? ""}`}
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      top: 23,
+                      right: 23,
+                      width: 30,
+                      height: 30,
+                      objectFit: "cover",
+                      borderRadius: 4,
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={ObjLp}
+                    alt={`album-${letterOpenId ?? ""}`}
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      top: 23,
+                      right: 23,
+                      width: 30,
+                      height: 30,
+                      objectFit: "cover",
+                      borderRadius: 4,
+                    }}
+                  />
+                )}
 
                 <img
                   src={StampWebp}
@@ -449,13 +591,43 @@ function BoardPage() {
                   }}
                 />
               </div>
+              <div className="mx-auto flex w-60 flex-col gap-4">
+                <div className="flex flex-row gap-2">
+                  <div className="flex flex-1 flex-row items-center gap-1 rounded-md bg-white/10 px-4 py-3 backdrop-blur-md">
+                    <p className="text-base text-white">
+                      {messageDetail?.songName ?? "곡 제목"}
+                    </p>
+                    <p className="text-gray-500 text-xs">
+                      {messageDetail?.artist ?? "가수"}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-md"
+                    onClick={(e) => {
+                      // prevent overlay click from closing modal when Play button is clicked
+                      e.stopPropagation();
+                    }}
+                    onKeyDown={(e) => {
+                      // ensure keyboard interaction also does not close the modal
+                      e.stopPropagation();
+                    }}
+                    aria-label="play"
+                  >
+                    <PlayIcon />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
         <div className="mb-24">
           <Pagination
             totalPages={
-              isSharedBoard && sharedBoardData ? sharedBoardData.totalPages : 1
+              isSharedBoard && sharedBoardData
+                ? sharedBoardData.totalPages
+                : totalPages
             }
             initialPage={currentPage + 1}
             onPageChange={(page) => setCurrentPage(page - 1)}
