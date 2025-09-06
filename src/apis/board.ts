@@ -29,13 +29,15 @@ export const getSharedBoard = async (
   size: number = 10,
   sort: string = "desc"
 ): Promise<SharedBoardResponse> => {
-  const params = new URLSearchParams({
+  // send pagination/sort as query params on GET
+  const qs = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
     sort,
-  });
+  }).toString();
+
   return apiGet<SharedBoardResponse>(
-    `${API_ENDPOINTS.BOARD.SHARED_BOARD(shareUri)}?${params.toString()}`
+    `${API_ENDPOINTS.BOARD.SHARED_BOARD(shareUri)}?${qs}`
   );
 };
 
@@ -58,7 +60,6 @@ export const getBoardList = async (
   size = 10,
   sort = "desc"
 ): Promise<BoardListResponse> => {
-  const body = { page, size, sort: [sort] } as unknown as object;
-  // backend expects POST body with pagination options; respond with wrapper { success, code, message, data }
-  return apiPost<BoardListResponse, object>(API_ENDPOINTS.BOARD.LIST, body);
+  const body = { page, size, sort } as unknown as object;
+  return apiGet<BoardListResponse, object>(API_ENDPOINTS.BOARD.LIST, body);
 };

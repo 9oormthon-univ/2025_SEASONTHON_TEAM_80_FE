@@ -18,9 +18,12 @@ export interface GetBoardShareResponse {
 
 export interface SharedBoardMessage {
   messageId: string;
-  albumCoverUrl: string;
-  songTitle: string;
-  artist: string;
+  // cover image URL for the shared board item
+  coverImageUrl: string;
+  // sender name
+  sender: string;
+  // whether the message has been read
+  read?: boolean;
 }
 
 export interface SharedBoardResponse {
@@ -29,6 +32,7 @@ export interface SharedBoardResponse {
   pageSize: number;
   totalElements: number;
   totalPages: number;
+  // owner nickname (optional)
   nickname?: string;
 }
 
@@ -38,8 +42,13 @@ export interface SharedBoardInfo {
 
 export interface BoardListItem {
   messageId: string;
-  sender: string;
+  senderName: string;
+  content: string;
+  songId: string;
+  songName: string;
+  artist: string;
   coverImageUrl: string;
+  songUrl: string;
   read: boolean;
 }
 

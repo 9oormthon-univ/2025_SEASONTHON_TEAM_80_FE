@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBoardList, getBoardShare, getSharedBoard } from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
@@ -17,6 +17,7 @@ import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
 import { Sidebar } from "@/components/ui/sidebar";
+import { useAudio } from "@/hooks/useAudio";
 import type { BoardListItem, SharedBoardMessage } from "@/types/board";
 
 function BoardPage() {
@@ -81,6 +82,23 @@ function BoardPage() {
     if (isSharedBoard && sharedBoardData?.nickname) {
       setOwnerNickname(sharedBoardData.nickname);
     }
+    // if shared board provides pagination/total info, reflect it
+    if (isSharedBoard && sharedBoardData) {
+      const mapped = (sharedBoardData.content ?? []).map((s) => ({
+        messageId: s.messageId,
+        senderName: s.sender,
+        content: "",
+        songId: "",
+        songName: "",
+        artist: "",
+        coverImageUrl: s.coverImageUrl,
+        songUrl: "",
+        read: s.read ?? false,
+      }));
+      setBoardList(mapped);
+      setTotalPages(sharedBoardData.totalPages ?? 1);
+      setBoardTotalElements(sharedBoardData.totalElements ?? 0);
+    }
   }, [isSharedBoard, sharedBoardData]);
 
   const ORIGINAL_POS = [
@@ -98,8 +116,9 @@ function BoardPage() {
     { id: 12, x: 265, y: 290 },
   ];
 
-  const POCKET_COORD = { x: 190, y: 120 }; // adjusted for reduced top margin
-  const HAT_COORD = { x: 10, y: 200 }; // adjusted for reduced top margin
+  // align pocket/hat coords to existing ORIGINAL_POS entries so they render
+  const POCKET_COORD = { x: 175, y: 102 };
+  const HAT_COORD = { x: 0, y: 200 };
   const POCKET_OFFSET = { x: -8, y: 0 };
   const [shiftPx, setShiftPx] = useState<{ x: number; y: number }>({
     x: 0,
@@ -117,6 +136,8 @@ function BoardPage() {
   const [messageDetail, setMessageDetail] = useState<
     import("@/types/board").BoardMessageData | null
   >(null);
+
+  const { isPlaying, playAudio, stopAudio, toggleAudio } = useAudio();
 
   useEffect(() => {
     // use a fixed server time as requested
@@ -146,7 +167,7 @@ function BoardPage() {
     return () => window.clearInterval(id);
   }, []);
 
-  function computeShift() {
+  const computeShift = useCallback(() => {
     const img = shelfRef.current;
     const wrap = shelfWrapperRef.current;
     if (!img || !wrap) return;
@@ -158,13 +179,13 @@ function BoardPage() {
     const shiftY = Math.round((rect.height * shiftPct) / 100);
 
     setShiftPx({ x: shiftX, y: shiftY });
-  }
+  }, []);
 
   useEffect(() => {
     computeShift();
     window.addEventListener("resize", computeShift);
     return () => window.removeEventListener("resize", computeShift);
-  }, []);
+  }, [computeShift]);
 
   useEffect(() => {
     if (letterOpenId !== null) {
@@ -178,6 +199,7 @@ function BoardPage() {
     (async () => {
       if (letterOpenId === null) {
         setMessageDetail(null);
+        stopAudio();
         return;
       }
 
@@ -196,8 +218,14 @@ function BoardPage() {
         );
         if (!mounted) return;
         setMessageDetail(res.data ?? null);
+
+        // Start playing music if songUrl is available
+        if (res.data?.songUrl) {
+          playAudio(res.data.songUrl).catch((error) => {
+            console.error("Failed to start audio playback:", error);
+          });
+        }
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error("Failed to load message detail", err);
         setMessageDetail(null);
       }
@@ -206,7 +234,14 @@ function BoardPage() {
     return () => {
       mounted = false;
     };
-  }, [letterOpenId, isSharedBoard, boardList, sharedBoardData]);
+  }, [
+    letterOpenId,
+    isSharedBoard,
+    boardList,
+    sharedBoardData,
+    playAudio,
+    stopAudio,
+  ]);
 
   return (
     <div className="relative flex min-h-screen flex-col pb-[77px]">
@@ -344,11 +379,13 @@ function BoardPage() {
                 <img
                   key={`placeholder-${id}`}
                   aria-hidden
-                  onClick={() => setLetterOpenId(id)}
+                  onClick={() => {
+                    if (!isSharedBoard) setLetterOpenId(id);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setLetterOpenId(id);
+                      if (!isSharedBoard) setLetterOpenId(id);
                     }
                   }}
                   alt=""
@@ -370,7 +407,9 @@ function BoardPage() {
                   key={`cover-${id}`}
                   type="button"
                   aria-label={`album-cover-${id}`}
-                  onClick={() => setLetterOpenId(id)}
+                  onClick={() => {
+                    if (!isSharedBoard) setLetterOpenId(id);
+                  }}
                   style={{
                     position: "absolute",
                     left:
@@ -392,7 +431,7 @@ function BoardPage() {
                         const sharedItem = item as SharedBoardMessage;
                         return (
                           <img
-                            src={sharedItem.albumCoverUrl}
+                            src={sharedItem.coverImageUrl}
                             alt={`album-cover-${sharedItem.messageId}`}
                             style={{
                               width: "100%",
@@ -429,9 +468,15 @@ function BoardPage() {
               role="dialog"
               aria-modal="true"
               tabIndex={-1}
-              onClick={() => setLetterOpenId(null)}
+              onClick={() => {
+                setLetterOpenId(null);
+                stopAudio();
+              }}
               onKeyDown={(e) => {
-                if (e.key === "Escape") setLetterOpenId(null);
+                if (e.key === "Escape") {
+                  setLetterOpenId(null);
+                  stopAudio();
+                }
               }}
               style={{
                 position: "fixed",
@@ -607,12 +652,13 @@ function BoardPage() {
                     onClick={(e) => {
                       // prevent overlay click from closing modal when Play button is clicked
                       e.stopPropagation();
+                      toggleAudio();
                     }}
                     onKeyDown={(e) => {
                       // ensure keyboard interaction also does not close the modal
                       e.stopPropagation();
                     }}
-                    aria-label="play"
+                    aria-label={isPlaying ? "pause" : "play"}
                   >
                     <PlayIcon />
                   </button>
