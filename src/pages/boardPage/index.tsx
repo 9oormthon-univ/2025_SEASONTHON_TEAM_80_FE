@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBoardList, getBoardShare, getSharedBoard } from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
@@ -86,8 +86,13 @@ function BoardPage() {
     if (isSharedBoard && sharedBoardData) {
       const mapped = (sharedBoardData.content ?? []).map((s) => ({
         messageId: s.messageId,
-        sender: s.sender,
+        senderName: s.sender,
+        content: "",
+        songId: "",
+        songName: "",
+        artist: "",
         coverImageUrl: s.coverImageUrl,
+        songUrl: "",
         read: s.read ?? false,
       }));
       setBoardList(mapped);
