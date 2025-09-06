@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
     LIST: "/board",
     DETAIL: (messageId: number | string) => `/board/${messageId}`,
     SHARE: "/board/share",
+    SHARED_BOARD: (shareUri: string) => `/board/share/${shareUri}`,
     INFO: "/board/info",
     CREATE: "/board/create",
   },

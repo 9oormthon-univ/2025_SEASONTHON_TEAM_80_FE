@@ -1,37 +1,57 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getSharedBoard } from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
 import ShelfBg from "@/assets/bg_shelf.webp";
 import BoardNoteIcon from "@/assets/ic_board_note.svg?react";
+import FrameImg from "@/assets/ic_frame.webp";
 import HamburgerIcon from "@/assets/ic_hamburger.svg?react";
 import HatIcon from "@/assets/ic_hat.svg?react";
 import HeaderIcon from "@/assets/ic_header_logo.svg?react";
 import LinkIcon from "@/assets/ic_link.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
-import FrameImg from "@/assets/ic_frame.webp";
 import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
 
 function BoardPage() {
+  const { shareUri } = useParams();
+  const isSharedBoard = Boolean(shareUri);
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const shelfRef = useRef<HTMLImageElement | null>(null);
   const shelfWrapperRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  // original pixel positions adjusted towards top-left with reduced top margin
+  const [currentPage, setCurrentPage] = useState(0);
+  const [ownerNickname, setOwnerNickname] = useState<string>("닉네임");
+
+  const { data: sharedBoardData, isLoading } = useQuery({
+    queryKey: ["sharedBoard", shareUri, currentPage],
+    queryFn: () => getSharedBoard(shareUri!, currentPage, 10),
+    enabled: isSharedBoard && Boolean(shareUri),
+  });
+
+  useEffect(() => {
+    if (isSharedBoard && sharedBoardData?.nickname) {
+      setOwnerNickname(sharedBoardData.nickname);
+    }
+  }, [isSharedBoard, sharedBoardData]);
+
   const ORIGINAL_POS = [
-  { id: 1, x: 0, y: 10 },
+    { id: 1, x: 0, y: 10 },
     { id: 2, x: 85, y: 10 },
     { id: 3, x: 175, y: 10 },
     { id: 4, x: 265, y: 10 },
-  { id: 5, x: 0, y: 102 },
+    { id: 5, x: 0, y: 102 },
     { id: 6, x: 85, y: 102 },
     { id: 7, x: 175, y: 102 },
     { id: 8, x: 265, y: 102 },
-  { id: 9, x: 0, y: 200 },
+    { id: 9, x: 0, y: 200 },
     { id: 10, x: 265, y: 200 },
-  { id: 11, x: 0, y: 290 },
+    { id: 11, x: 0, y: 290 },
     { id: 12, x: 265, y: 290 },
   ];
 
@@ -96,7 +116,7 @@ function BoardPage() {
     const shiftX = Math.round((rect.width * shiftPct) / 100);
     const shiftY = Math.round((rect.height * shiftPct) / 100);
 
-  setShiftPx({ x: shiftX, y: shiftY });
+    setShiftPx({ x: shiftX, y: shiftY });
   }
 
   useEffect(() => {
@@ -147,7 +167,7 @@ function BoardPage() {
       >
         <div className="absolute top-20 left-[155px] mt-[20px]">
           <span className="font-primary text-[20px] text-brown-100">
-            닉네임 님의 LP 보드
+            {ownerNickname} 님의 LP 보드
           </span>
           <div
             className="mt-3 flex items-center"
@@ -166,7 +186,11 @@ function BoardPage() {
             >
               <BoardNoteIcon style={{ width: 12, height: 12 }} />
               <span className="ml-1 whitespace-nowrap font-bold">
-                총 00개 음반
+                총{" "}
+                {isSharedBoard && sharedBoardData
+                  ? sharedBoardData.totalElements
+                  : "00"}
+                개 음반
               </span>
             </div>
           </div>
@@ -189,15 +213,14 @@ function BoardPage() {
                   key={`lucky-${id}`}
                   style={{
                     position: "absolute",
-                    left: orig.x + shiftPx.x + POCKET_OFFSET.x - 3 + GLOBAL_LEFT_PX,
+                    left:
+                      orig.x + shiftPx.x + POCKET_OFFSET.x - 3 + GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + POCKET_OFFSET.y + GLOBAL_DOWN_PX,
                     width: 78,
                     height: 78,
                   }}
                 >
-                  <LuckyPocketIcon
-                    style={{ width: "100%", height: "100%" }}
-                  />
+                  <LuckyPocketIcon style={{ width: "100%", height: "100%" }} />
                 </div>
               );
             }
@@ -260,7 +283,8 @@ function BoardPage() {
                   onClick={() => setLetterOpenId(id)}
                   style={{
                     position: "absolute",
-                    left: orig.x + shiftPx.x + coverOffsetPx + 2 + GLOBAL_LEFT_PX,
+                    left:
+                      orig.x + shiftPx.x + coverOffsetPx + 2 + GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx,
                     width: 48,
                     height: 48,
@@ -415,15 +439,25 @@ function BoardPage() {
           )}
         </div>
         <div className="mb-24">
-          <Pagination totalPages={10} />
+          <Pagination
+            totalPages={
+              isSharedBoard && sharedBoardData ? sharedBoardData.totalPages : 1
+            }
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
 
       <div className="fixed right-0 bottom-0 left-0 flex justify-center">
         <LinkShareButton
-          label="링크 공유"
+          label={
+            isSharedBoard ? `${ownerNickname}님에게 마음 전달하기` : "링크 공유"
+          }
           Icon={LinkIcon}
           className="w-full max-w-[450px]"
+          isSharedBoard={isSharedBoard}
+          shareUri={shareUri}
         />
       </div>
     </div>
