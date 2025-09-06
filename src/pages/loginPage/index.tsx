@@ -1,15 +1,11 @@
 import LogoIcon from "@/assets/ic_logo.svg?react";
 import StarIcon from "@/assets/ic_star.svg?react";
-import { getKakaoLoginURL } from "@/lib/kakaoAuth";
 import { DDayCounter } from "@/pages/loginPage/components/dday-counter";
 import { KakaoLoginButton } from "@/pages/loginPage/components/kakao-login-button";
 
 function LoginPage() {
   const handleKakaoLogin = () => {
     try {
-      const kakaoLoginURL = getKakaoLoginURL();
-      console.log("카카오 로그인 URL:", kakaoLoginURL);
-
       window.location.href = `${import.meta.env.VITE_SERVER_URL}/oauth2/authorization/kakao`;
     } catch (error) {
       console.error("카카오 로그인 URL 생성 실패:", error);
