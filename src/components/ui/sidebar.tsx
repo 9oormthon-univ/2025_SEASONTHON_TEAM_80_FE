@@ -36,8 +36,8 @@ export function Sidebar({
     }
   };
   return (
-    <div className="relative h-screen w-72 flex-shrink-0 overflow-hidden rounded-tl-[10px] rounded-bl-[10px] bg-neutral-100">
-      <div className="mx-[14px] my-[14px] flex h-[638px] w-52 flex-col">
+    <div className="relative h-dvh w-72 flex-shrink-0 overflow-hidden rounded-tl-[10px] rounded-bl-[10px] bg-neutral-100">
+      <div className="mx-[14px] my-[14px] flex h-[calc(100dvh-28px)] w-52 flex-col">
         <div className="flex flex-col gap-6">
           <button
             type="button"
@@ -149,7 +149,7 @@ export function Sidebar({
           <div className="h-0 w-60 outline outline-[#E6E6E6] outline-offset-[-0.50px]" />
 
           <div className="font-semibold text-[8px] text-neutral-500 leading-3 tracking-tight">
-            Copyright ©santafive. All rights reserved.
+            Copyright ©firstsori. All rights reserved.
           </div>
         </div>
       </div>
