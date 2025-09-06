@@ -104,7 +104,7 @@ export default function AppRoutes() {
       <Route
         path={ROUTES.USER.PROFILE}
         element={
-          <ProtectedRoute requireBoard={false}>
+          <ProtectedRoute requireBoard={true}>
             <UserProfilePage />
           </ProtectedRoute>
         }
