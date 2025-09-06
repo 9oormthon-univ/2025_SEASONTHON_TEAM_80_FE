@@ -58,13 +58,13 @@ function BoardPage() {
 
   // prefer route shareUri when present, otherwise use current user's shareUri
 
-  // derive shareUri from possible shapes returned by getBoardShare()
-  const maybe = currentUserBoard as unknown as
-    | Record<string, unknown>
-    | undefined;
-  const maybeData = maybe?.data as Record<string, unknown> | undefined;
-
   const shareUriFromCurrentUser = useMemo(() => {
+    // derive shareUri from possible shapes returned by getBoardShare()
+    const maybe = currentUserBoard as unknown as
+      | Record<string, unknown>
+      | undefined;
+    const maybeData = maybe?.data as Record<string, unknown> | undefined;
+
     return (
       // standard typed shape
       (currentUserBoard as unknown as { data?: { shareUri?: string } })?.data
@@ -74,7 +74,7 @@ function BoardPage() {
       (maybeData && (maybeData.share_uri as string | undefined)) ??
       (maybe && (maybe.share_url as string | undefined))
     );
-  }, [currentUserBoard, maybe, maybeData]);
+  }, [currentUserBoard]);
 
   const computedShareUri = useMemo(() => {
     return shareUri ?? shareUriFromCurrentUser;
@@ -101,18 +101,14 @@ function BoardPage() {
   useEffect(() => {
     // prefer boardInfo name when available (applies to shared and own board)
     const nameFromInfo = boardInfoQuery.data?.data?.name;
-    if (nameFromInfo) {
+    if (nameFromInfo && nameFromInfo !== ownerNickname) {
       setOwnerNickname(nameFromInfo);
-    } else if (isSharedBoard && sharedBoardData?.nickname) {
+    } else if (isSharedBoard && sharedBoardData?.nickname && sharedBoardData.nickname !== ownerNickname) {
       setOwnerNickname(sharedBoardData.nickname);
     }
+  }, [boardInfoQuery.data?.data?.name, sharedBoardData?.nickname, isSharedBoard, ownerNickname]);
 
-    // prefer server-provided message count when available
-    const msgCount = boardInfoQuery.data?.data?.messageCount;
-    if (typeof msgCount === "number") {
-      setBoardTotalElements(msgCount);
-    }
-
+  useEffect(() => {
     // handle shared board data
     if (isSharedBoard && sharedBoardData) {
       const mapped = (sharedBoardData.content ?? []).map((s) => ({
@@ -130,7 +126,9 @@ function BoardPage() {
       setTotalPages(sharedBoardData.totalPages ?? 1);
       setBoardTotalElements(sharedBoardData.totalElements ?? 0);
     }
-    
+  }, [isSharedBoard, sharedBoardData]);
+  
+  useEffect(() => {
     // handle current user board data
     if (!isSharedBoard && currentUserBoardList) {
       const data = currentUserBoardList.data;
@@ -138,7 +136,7 @@ function BoardPage() {
       setBoardTotalElements(data.totalElements ?? data.content?.length ?? 0);
       setTotalPages(data.totalPages ?? 1);
     }
-  }, [isSharedBoard, sharedBoardData, boardInfoQuery.data, currentUserBoardList]);
+  }, [isSharedBoard, currentUserBoardList]);
 
   const ORIGINAL_POS = [
     { id: 1, x: 0, y: 10 },
@@ -356,14 +354,7 @@ function BoardPage() {
       // Always stop audio when letter is closed
       stopAudio();
     };
-  }, [
-    letterOpenId,
-    isSharedBoard,
-    boardList,
-    sharedBoardData,
-    playAudio,
-    stopAudio,
-  ]);
+  }, [letterOpenId]);
 
   return (
     <div
