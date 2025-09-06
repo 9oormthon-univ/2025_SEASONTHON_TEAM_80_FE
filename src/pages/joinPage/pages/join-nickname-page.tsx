@@ -21,7 +21,9 @@ export default function JoinNicknamePage() {
       setIsLoading(true);
       const response = await createBoard({ nickname: nickname.trim() });
       console.log("보드 생성 성공:", response);
-      navigate(ROUTES.JOIN.GUIDE_WITH_SHARE.replace(":shareUri", response.shareUri));
+      navigate(
+        ROUTES.JOIN.GUIDE_WITH_SHARE.replace(":shareUri", response.shareUri)
+      );
     } catch (error) {
       console.error("보드 생성 API 에러:", error);
       alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");

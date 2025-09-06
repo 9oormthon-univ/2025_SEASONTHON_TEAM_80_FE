@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBoardList, getBoardShare, getSharedBoard } from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
@@ -81,6 +81,18 @@ function BoardPage() {
     if (isSharedBoard && sharedBoardData?.nickname) {
       setOwnerNickname(sharedBoardData.nickname);
     }
+    // if shared board provides pagination/total info, reflect it
+    if (isSharedBoard && sharedBoardData) {
+      const mapped = (sharedBoardData.content ?? []).map((s) => ({
+        messageId: s.messageId,
+        sender: s.sender,
+        coverImageUrl: s.coverImageUrl,
+        read: s.read ?? false,
+      }));
+      setBoardList(mapped);
+      setTotalPages(sharedBoardData.totalPages ?? 1);
+      setBoardTotalElements(sharedBoardData.totalElements ?? 0);
+    }
   }, [isSharedBoard, sharedBoardData]);
 
   const ORIGINAL_POS = [
@@ -98,8 +110,9 @@ function BoardPage() {
     { id: 12, x: 265, y: 290 },
   ];
 
-  const POCKET_COORD = { x: 190, y: 120 }; // adjusted for reduced top margin
-  const HAT_COORD = { x: 10, y: 200 }; // adjusted for reduced top margin
+  // align pocket/hat coords to existing ORIGINAL_POS entries so they render
+  const POCKET_COORD = { x: 175, y: 102 };
+  const HAT_COORD = { x: 0, y: 200 };
   const POCKET_OFFSET = { x: -8, y: 0 };
   const [shiftPx, setShiftPx] = useState<{ x: number; y: number }>({
     x: 0,
@@ -146,7 +159,7 @@ function BoardPage() {
     return () => window.clearInterval(id);
   }, []);
 
-  function computeShift() {
+  const computeShift = useCallback(() => {
     const img = shelfRef.current;
     const wrap = shelfWrapperRef.current;
     if (!img || !wrap) return;
@@ -158,13 +171,13 @@ function BoardPage() {
     const shiftY = Math.round((rect.height * shiftPct) / 100);
 
     setShiftPx({ x: shiftX, y: shiftY });
-  }
+  }, []);
 
   useEffect(() => {
     computeShift();
     window.addEventListener("resize", computeShift);
     return () => window.removeEventListener("resize", computeShift);
-  }, []);
+  }, [computeShift]);
 
   useEffect(() => {
     if (letterOpenId !== null) {
@@ -344,11 +357,13 @@ function BoardPage() {
                 <img
                   key={`placeholder-${id}`}
                   aria-hidden
-                  onClick={() => setLetterOpenId(id)}
+                  onClick={() => {
+                    if (!isSharedBoard) setLetterOpenId(id);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setLetterOpenId(id);
+                      if (!isSharedBoard) setLetterOpenId(id);
                     }
                   }}
                   alt=""
@@ -370,7 +385,9 @@ function BoardPage() {
                   key={`cover-${id}`}
                   type="button"
                   aria-label={`album-cover-${id}`}
-                  onClick={() => setLetterOpenId(id)}
+                  onClick={() => {
+                    if (!isSharedBoard) setLetterOpenId(id);
+                  }}
                   style={{
                     position: "absolute",
                     left:
@@ -392,7 +409,7 @@ function BoardPage() {
                         const sharedItem = item as SharedBoardMessage;
                         return (
                           <img
-                            src={sharedItem.albumCoverUrl}
+                            src={sharedItem.coverImageUrl}
                             alt={`album-cover-${sharedItem.messageId}`}
                             style={{
                               width: "100%",

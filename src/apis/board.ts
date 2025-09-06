@@ -29,13 +29,15 @@ export const getSharedBoard = async (
   size: number = 10,
   sort: string = "desc"
 ): Promise<SharedBoardResponse> => {
-  const params = new URLSearchParams({
+  // send pagination/sort as query params on GET
+  const qs = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
     sort,
-  });
+  }).toString();
+
   return apiGet<SharedBoardResponse>(
-    `${API_ENDPOINTS.BOARD.SHARED_BOARD(shareUri)}?${params.toString()}`
+    `${API_ENDPOINTS.BOARD.SHARED_BOARD(shareUri)}?${qs}`
   );
 };
 
