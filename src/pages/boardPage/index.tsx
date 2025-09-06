@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import BgLetter from "@/assets/bg_letterpaper.webp";
 import ShelfBg from "@/assets/bg_shelf.webp";
 import BoardNoteIcon from "@/assets/ic_board_note.svg?react";
+import FrameImg from "@/assets/ic_frame.webp";
 import HamburgerIcon from "@/assets/ic_hamburger.svg?react";
 import HatIcon from "@/assets/ic_hat.svg?react";
 import HeaderIcon from "@/assets/ic_header_logo.svg?react";
 import LinkIcon from "@/assets/ic_link.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
-import FrameImg from "@/assets/ic_frame.webp";
 import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
@@ -21,17 +21,17 @@ function BoardPage() {
 
   // original pixel positions adjusted towards top-left with reduced top margin
   const ORIGINAL_POS = [
-  { id: 1, x: 0, y: 10 },
+    { id: 1, x: 0, y: 10 },
     { id: 2, x: 85, y: 10 },
     { id: 3, x: 175, y: 10 },
     { id: 4, x: 265, y: 10 },
-  { id: 5, x: 0, y: 102 },
+    { id: 5, x: 0, y: 102 },
     { id: 6, x: 85, y: 102 },
     { id: 7, x: 175, y: 102 },
     { id: 8, x: 265, y: 102 },
-  { id: 9, x: 0, y: 200 },
+    { id: 9, x: 0, y: 200 },
     { id: 10, x: 265, y: 200 },
-  { id: 11, x: 0, y: 290 },
+    { id: 11, x: 0, y: 290 },
     { id: 12, x: 265, y: 290 },
   ];
 
@@ -96,7 +96,7 @@ function BoardPage() {
     const shiftX = Math.round((rect.width * shiftPct) / 100);
     const shiftY = Math.round((rect.height * shiftPct) / 100);
 
-  setShiftPx({ x: shiftX, y: shiftY });
+    setShiftPx({ x: shiftX, y: shiftY });
   }
 
   useEffect(() => {
@@ -189,15 +189,14 @@ function BoardPage() {
                   key={`lucky-${id}`}
                   style={{
                     position: "absolute",
-                    left: orig.x + shiftPx.x + POCKET_OFFSET.x - 3 + GLOBAL_LEFT_PX,
+                    left:
+                      orig.x + shiftPx.x + POCKET_OFFSET.x - 3 + GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + POCKET_OFFSET.y + GLOBAL_DOWN_PX,
                     width: 78,
                     height: 78,
                   }}
                 >
-                  <LuckyPocketIcon
-                    style={{ width: "100%", height: "100%" }}
-                  />
+                  <LuckyPocketIcon style={{ width: "100%", height: "100%" }} />
                 </div>
               );
             }
@@ -260,7 +259,8 @@ function BoardPage() {
                   onClick={() => setLetterOpenId(id)}
                   style={{
                     position: "absolute",
-                    left: orig.x + shiftPx.x + coverOffsetPx + 2 + GLOBAL_LEFT_PX,
+                    left:
+                      orig.x + shiftPx.x + coverOffsetPx + 2 + GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx,
                     width: 48,
                     height: 48,

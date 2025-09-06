@@ -1,82 +1,109 @@
-import { type ChangeEvent, useState } from "react";
+import {
+  type ChangeEvent,
+  type KeyboardEvent,
+  useEffect,
+  useState,
+} from "react";
+import { getPopularMusicCharts, getSearchedSongs } from "@/apis/music";
 import { BackButton } from "@/components/ui/back-button";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { SearchInput } from "@/components/ui/search-input";
 import { MusicList } from "@/pages/letterPage/components/music-list";
+import type { Song as ApiSong, MusicChart } from "@/types/song";
+
+type ListSong = {
+  id: string;
+  song_title: string;
+  artist: string;
+  album_cover: string;
+  streaming_url: string;
+};
 
 function MusicSearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
-
-  // 샘플 음악 데이터 (API 응답 형식에 맞춤)
-  const sampleSongs = [
-    {
-      id: "spotify_id_1",
-      song_title: "Sample Song Title",
-      artist: "Sample Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-    {
-      id: "spotify_id_2",
-      song_title: "Another Song",
-      artist: "Another Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-    {
-      id: "spotify_id_3",
-      song_title: "Third Song",
-      artist: "Third Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-    {
-      id: "spotify_id_4",
-      song_title: "Sample Song Title",
-      artist: "Sample Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-    {
-      id: "spotify_id_5",
-      song_title: "Another Song",
-      artist: "Another Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-    {
-      id: "spotify_id_6",
-      song_title: "Third Song",
-      artist: "Third Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-    {
-      id: "spotify_id_7",
-      song_title: "Sample Song Title",
-      artist: "Sample Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-    {
-      id: "spotify_id_8",
-      song_title: "Another Song",
-      artist: "Another Artist",
-      album_cover: "",
-      streaming_url: "",
-    },
-  ];
-
+  const [recommended, setRecommended] = useState<ListSong[]>([]);
+  const [results, setResults] = useState<ListSong[]>([]);
   const [selectedSongs, setSelectedSongs] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const toggleSongSelection = (songId: string) => {
     setSelectedSongs((prev) => (prev.includes(songId) ? [] : [songId]));
   };
 
-  // 선택된 곡 정보 가져오기
+  const mapChartToListSong = (chart: MusicChart): ListSong => ({
+    id: chart.musicId,
+    song_title: chart.songName,
+    artist: chart.artist,
+    album_cover: chart.albumImageUrl,
+    streaming_url: chart.songUrl,
+  });
+
+  const mapApiSongToListSong = (s: ApiSong): ListSong => ({
+    id: s.songId,
+    song_title: s.songTitle,
+    artist: s.artist,
+    album_cover: s.coverImage,
+    streaming_url: s.streamingUrl || s.prestreamingUrl || "",
+  });
+
+  // 인기 차트(추천) 불러오기
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const charts = await getPopularMusicCharts();
+        if (!mounted) return;
+
+        const chartArray: unknown = Array.isArray(charts)
+          ? charts
+          : ((charts as any)?.data ?? (charts as any)?.items ?? []);
+
+        if (!Array.isArray(chartArray)) {
+          setRecommended([]);
+          return;
+        }
+
+        setRecommended((chartArray as MusicChart[]).map(mapChartToListSong));
+      } catch (e) {
+        console.error("Failed to load popular charts:", e);
+        setRecommended([]);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const performSearch = async (query: string) => {
+    const q = query.trim();
+    if (!q) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const songs = await getSearchedSongs(q);
+      setResults(songs.map(mapApiSongToListSong));
+    } catch (e) {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      // Enter 눌렀을 때만 검색 실행
+      void performSearch(searchQuery);
+    }
+  };
+
+  const displayedSongs = searchQuery.trim() ? results : recommended;
+
   const selectedSong =
     selectedSongs.length > 0
-      ? sampleSongs.find((song) => song.id === selectedSongs[0])
+      ? (displayedSongs.find((song) => song.id === selectedSongs[0]) ?? null)
       : null;
 
   return (
@@ -96,30 +123,37 @@ function MusicSearchPage() {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearchQuery(e.target.value)
           }
+          onKeyDown={onInputKeyDown}
           placeholder="곡, 앨범, 아티스트 명으로 검색"
           maxLength={50}
         />
       </div>
 
-      {/* 추천 음악 섹션 (임시) */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <h2 className="mb-4 px-4 font-semibold text-[16px] text-brown-200">
-          추천
+          {searchQuery.trim() ? "검색 결과" : "추천"}
         </h2>
 
-        {/* 음악 리스트 - 스크롤 가능 */}
         <div className="flex-1 overflow-y-auto">
           <MusicList
-            songs={sampleSongs}
+            songs={displayedSongs}
             selectedSongs={selectedSongs}
             onToggleSelection={toggleSongSelection}
           />
+          {loading && (
+            <div className="px-4 py-3 text-center text-gray-500 text-sm">
+              검색 중...
+            </div>
+          )}
+          {!loading && searchQuery.trim() && displayedSongs.length === 0 && (
+            <div className="px-4 py-3 text-center text-gray-500 text-sm">
+              검색 결과가 없습니다.
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 하단 고정 영역 */}
       <div className="mt-auto">
-        {/* 선택된 곡 정보 영역 */}
         <div
           className="flex h-[104px] items-start px-4 pt-4"
           style={{
@@ -152,7 +186,6 @@ function MusicSearchPage() {
           )}
         </div>
 
-        {/* 선택 버튼 */}
         <div className="flex h-[46px] items-end bg-white px-4 pb-5">
           <NavigationButton active={selectedSongs.length > 0}>
             선택

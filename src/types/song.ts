@@ -1,7 +1,17 @@
 export interface Song {
-  id: string;
-  song_title: string;
+  songId: string;
+  songTitle: string;
   artist: string;
-  album_cover: string;
-  streaming_url: string;
+  coverImage: string;
+  streamingUrl: string;
+  prestreamingUrl: string;
+}
+
+export interface MusicChart {
+  musicId: string;
+  songName: string;
+  artist: string;
+  albumImageUrl: string;
+  songUrl: string;
+  score: number;
 }

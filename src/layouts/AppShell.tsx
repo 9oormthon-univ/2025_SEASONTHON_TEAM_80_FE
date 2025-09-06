@@ -19,7 +19,7 @@ export default function AppShell({ children }: PropsWithChildren) {
 
   return (
     <div
-      className={`h-dvh overflow-hidden ${isLetterSearch ? "bg-white text-black" : "bg-[#412716] text-white"}`}
+      className={`h-dvh overflow-hidden ${isLetterSearch ? "bg-white text-black" : pathname === "/" ? "bg-[#212E5A] text-white" : "bg-[#412716] text-white"}`}
     >
       <main
         className={`mx-auto h-full w-full max-w-[450px] bg-center bg-cover bg-no-repeat ${shouldRemovePadding ? "" : "p-4"}`}
