@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logout } from "@/apis/auth";
 import { getBoardInfo } from "@/apis/board";
@@ -10,6 +11,7 @@ import PersonIcon from "@/assets/ic_person.svg?react";
 import SignOutIcon from "@/assets/ic_sign_out.svg?react";
 import VideoIcon from "@/assets/ic_video.svg?react";
 import XIcon from "@/assets/ic_x.svg?react";
+import { Alert } from "@/components/ui/alert";
 
 interface SidebarProps {
   nickname?: string;
@@ -22,6 +24,8 @@ export function Sidebar({
   onClose,
   shareUri,
 }: SidebarProps) {
+  const [showLogoutAlert, setShowLogoutAlert] = useState(false);
+
   const { data: boardInfo } = useQuery({
     queryKey: ["boardInfo", shareUri],
     queryFn: () => getBoardInfo(shareUri!),
@@ -30,13 +34,22 @@ export function Sidebar({
 
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setShowLogoutAlert(true);
+  };
+
+  const handleLogoutConfirm = async () => {
     try {
       await logout();
-      window.location.reload();
+      navigate("/");
     } catch (error) {
       console.error("로그아웃 실패:", error);
     }
+    setShowLogoutAlert(false);
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutAlert(false);
   };
 
   const handleNavigateProfile = () => {
@@ -147,7 +160,7 @@ export function Sidebar({
         <div className="absolute bottom-[14px] left-[14px] flex w-52 flex-col gap-2">
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={handleLogoutClick}
             className="flex h-12 w-full items-center gap-3 overflow-hidden py-2 text-left transition-colors hover:bg-neutral-200"
           >
             <div className="relative h-10 w-10">
@@ -165,6 +178,15 @@ export function Sidebar({
           </div>
         </div>
       </div>
+
+      <Alert
+        isOpen={showLogoutAlert}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+        leftButtonText="취소"
+        rightButtonText="로그아웃"
+        content="로그아웃하시겠습니까?"
+      />
     </div>
   );
 }
