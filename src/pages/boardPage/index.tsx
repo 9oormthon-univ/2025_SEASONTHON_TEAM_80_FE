@@ -194,7 +194,7 @@ function BoardPage() {
 
   useEffect(() => {
     // use a fixed server time as requested
-  const serverTimeStr = boardInfoQuery?.data?.data?.serverTime ?? "2025-09-05T06:00:00Z";
+  const serverTimeStr = boardInfoQuery?.data?.data?.serverTime ?? new Date().toISOString();
     const serverNow = new Date(serverTimeStr);
     const startClient = Date.now();
 
