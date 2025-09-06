@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   getBoardInfo,
@@ -58,22 +58,27 @@ function BoardPage() {
 
   // prefer route shareUri when present, otherwise use current user's shareUri
 
-  // derive shareUri from possible shapes returned by getBoardShare()
-  const maybe = currentUserBoard as unknown as
-    | Record<string, unknown>
-    | undefined;
-  const maybeData = maybe?.data as Record<string, unknown> | undefined;
+  const shareUriFromCurrentUser = useMemo(() => {
+    // derive shareUri from possible shapes returned by getBoardShare()
+    const maybe = currentUserBoard as unknown as
+      | Record<string, unknown>
+      | undefined;
+    const maybeData = maybe?.data as Record<string, unknown> | undefined;
 
-  const shareUriFromCurrentUser =
-    // standard typed shape
-    (currentUserBoard as unknown as { data?: { shareUri?: string } })?.data
-      ?.shareUri ??
-    // top-level or alternative keys
-    (maybe && (maybe.shareUri as string | undefined)) ??
-    (maybeData && (maybeData.share_uri as string | undefined)) ??
-    (maybe && (maybe.share_url as string | undefined));
+    return (
+      // standard typed shape
+      (currentUserBoard as unknown as { data?: { shareUri?: string } })?.data
+        ?.shareUri ??
+      // top-level or alternative keys
+      (maybe && (maybe.shareUri as string | undefined)) ??
+      (maybeData && (maybeData.share_uri as string | undefined)) ??
+      (maybe && (maybe.share_url as string | undefined))
+    );
+  }, [currentUserBoard]);
 
-  const computedShareUri = shareUri ?? shareUriFromCurrentUser;
+  const computedShareUri = useMemo(() => {
+    return shareUri ?? shareUriFromCurrentUser;
+  }, [shareUri, shareUriFromCurrentUser]);
 
   // boardInfo query: fetch automatically when a shareUri (route or current user) exists
   const boardInfoQuery = useQuery({
@@ -85,66 +90,34 @@ function BoardPage() {
     enabled: Boolean(computedShareUri),
   });
 
-  // ensure the boardInfo request is made when computedShareUri becomes available
-  useEffect(() => {
-    if (!computedShareUri) return;
-    if (boardInfoQuery.isFetching) return;
-    if (boardInfoQuery.data) return;
-    // trigger fetch
-    void boardInfoQuery.refetch();
-  }, [
-    computedShareUri,
-    boardInfoQuery.isFetching,
-    boardInfoQuery.data,
-    boardInfoQuery.refetch,
-  ]);
-
   // fetch current user's board list (paginated) when not viewing a shared board
-  useEffect(() => {
-    let mounted = true;
-    if (!isSharedBoard) {
-      (async () => {
-        try {
-          const res = await getBoardList(currentPage, 10, "desc");
-          if (!mounted) return;
-          // API returns wrapper { success, code, message, data }
-          const data = res.data;
-          setBoardList(data.content ?? []);
-          setBoardTotalElements(
-            data.totalElements ?? data.content?.length ?? 0
-          );
-          setTotalPages(data.totalPages ?? 1);
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.error("Failed to load board list", err);
-          setBoardList([]);
-          setBoardTotalElements(0);
-          setTotalPages(1);
-        }
-      })();
-    }
-
-    return () => {
-      mounted = false;
-    };
-  }, [isSharedBoard, currentPage]);
+  const { data: currentUserBoardList } = useQuery({
+    queryKey: ["currentUserBoardList", currentPage],
+    queryFn: () => getBoardList(currentPage, 10, "desc"),
+    enabled: !isSharedBoard,
+  });
 
   useEffect(() => {
     // prefer boardInfo name when available (applies to shared and own board)
     const nameFromInfo = boardInfoQuery.data?.data?.name;
-    if (nameFromInfo) {
+    if (nameFromInfo && nameFromInfo !== ownerNickname) {
       setOwnerNickname(nameFromInfo);
-    } else if (isSharedBoard && sharedBoardData?.nickname) {
+    } else if (
+      isSharedBoard &&
+      sharedBoardData?.nickname &&
+      sharedBoardData.nickname !== ownerNickname
+    ) {
       setOwnerNickname(sharedBoardData.nickname);
     }
+  }, [
+    boardInfoQuery.data?.data?.name,
+    sharedBoardData?.nickname,
+    isSharedBoard,
+    ownerNickname,
+  ]);
 
-    // prefer server-provided message count when available
-    const msgCount = boardInfoQuery.data?.data?.messageCount;
-    if (typeof msgCount === "number") {
-      setBoardTotalElements(msgCount);
-    }
-
-    // if shared board provides pagination/total info, reflect it
+  useEffect(() => {
+    // handle shared board data
     if (isSharedBoard && sharedBoardData) {
       const mapped = (sharedBoardData.content ?? []).map((s) => ({
         messageId: s.messageId,
@@ -161,7 +134,17 @@ function BoardPage() {
       setTotalPages(sharedBoardData.totalPages ?? 1);
       setBoardTotalElements(sharedBoardData.totalElements ?? 0);
     }
-  }, [isSharedBoard, sharedBoardData, boardInfoQuery.data]);
+  }, [isSharedBoard, sharedBoardData]);
+
+  useEffect(() => {
+    // handle current user board data
+    if (!isSharedBoard && currentUserBoardList) {
+      const data = currentUserBoardList.data;
+      setBoardList(data.content ?? []);
+      setBoardTotalElements(data.totalElements ?? data.content?.length ?? 0);
+      setTotalPages(data.totalPages ?? 1);
+    }
+  }, [isSharedBoard, currentUserBoardList]);
 
   const ORIGINAL_POS = [
     { id: 1, x: 0, y: 10 },
@@ -376,15 +359,10 @@ function BoardPage() {
 
     return () => {
       mounted = false;
+      // Always stop audio when letter is closed
+      stopAudio();
     };
-  }, [
-    letterOpenId,
-    isSharedBoard,
-    boardList,
-    sharedBoardData,
-    playAudio,
-    stopAudio,
-  ]);
+  }, [letterOpenId]);
 
   return (
     <div
