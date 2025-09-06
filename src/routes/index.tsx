@@ -114,7 +114,16 @@ export default function AppRoutes() {
       <Route path={ROUTES.LETTER.SELECT} element={<LetterSelectPage />} />
       <Route path={ROUTES.LETTER.WRITE} element={<LetterWritePage />} />
       <Route path={ROUTES.LETTER.COMPLETE} element={<LetterCompletePage />} />
-      <Route path={ROUTES.BOARD} element={<BoardPage />} />
+
+      <Route
+        path={ROUTES.BOARD}
+        element={
+          <ProtectedRoute requireBoard={true}>
+            <BoardPage />
+          </ProtectedRoute>
+        }
+      />
+
       <Route path={ROUTES.SHARED_BOARD} element={<BoardPage />} />
       <Route path={ROUTES.ERROR} element={<ErrorPage />} />
     </Routes>
