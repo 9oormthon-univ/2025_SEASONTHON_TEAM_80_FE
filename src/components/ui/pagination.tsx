@@ -77,7 +77,12 @@ function Pagination({
   if (totalPages <= 0) return null;
 
   return (
-    <div className={cn("flex w-96 items-center justify-between", className)}>
+    <div
+      className={cn(
+        "flex w-full max-w-[450px] items-center justify-between",
+        className
+      )}
+    >
       {/* 이전 버튼 */}
       <button
         type="button"
