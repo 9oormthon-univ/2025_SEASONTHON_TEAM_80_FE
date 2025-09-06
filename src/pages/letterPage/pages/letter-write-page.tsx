@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getBoardInfo } from "@/apis/board";
 import { postMessage } from "@/apis/message";
 import LetterPaperBg from "@/assets/bg_letterpaper.webp";
 import SideDiskIcon from "@/assets/ic_side_disk.svg?react";
@@ -17,6 +18,7 @@ export default function LetterWritePage() {
   const [letterContent, setLetterContent] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [albumImageUrl, setAlbumImageUrl] = useState<string | null>(null);
+  const [recipientNickname, setRecipientNickname] = useState("닉네임");
 
   const LOCALSTORAGE_KEY = "messageDraft";
 
@@ -33,6 +35,20 @@ export default function LetterWritePage() {
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    const fetchBoardInfo = async () => {
+      if (!shareUri) return;
+      try {
+        const response = await getBoardInfo(shareUri);
+        setRecipientNickname(response.data.name);
+      } catch (error) {
+        console.error("Failed to fetch board info:", error);
+      }
+    };
+    
+    fetchBoardInfo();
+  }, [shareUri]);
 
   const isFormValid =
     letterContent.trim() !== "" &&
@@ -137,7 +153,7 @@ export default function LetterWritePage() {
         <div className="dynamic-bottom-position absolute z-20 h-[294px] w-[294px] px-5 py-5">
           {/* To. 닉네임 - 좌측 상단 */}
           <div className="absolute top-5 left-5 font-letter text-black text-xs">
-            To. 닉네임
+            To. {recipientNickname}
           </div>
           <img
             src={StampWebp}

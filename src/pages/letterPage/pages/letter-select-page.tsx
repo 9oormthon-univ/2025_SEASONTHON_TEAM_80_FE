@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getBoardInfo } from "@/apis/board";
 import PlayIcon from "@/assets/ic_play.svg?react";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { PageLayout } from "@/components/ui/page-layout";
@@ -16,6 +18,21 @@ export default function LetterSelectPage({
 }: LetterSelectPageProps) {
   const navigate = useNavigate();
   const { shareUri } = useParams();
+  const [recipientNickname, setRecipientNickname] = useState(nickname);
+
+  useEffect(() => {
+    const fetchBoardInfo = async () => {
+      if (!shareUri) return;
+      try {
+        const response = await getBoardInfo(shareUri);
+        setRecipientNickname(response.data.name);
+      } catch (error) {
+        console.error("Failed to fetch board info:", error);
+      }
+    };
+    
+    fetchBoardInfo();
+  }, [shareUri]);
 
   const handleClick = () => {
     navigate(shareUri ? `/letter/write/${shareUri}` : "/letter/write");
@@ -25,7 +42,7 @@ export default function LetterSelectPage({
     <PageLayout
       title={
         <>
-          {nickname} 님께 <br />이 노래를 들려드릴까요?
+          {recipientNickname} 님께 <br />이 노래를 들려드릴까요?
         </>
       }
       bottomContent={
