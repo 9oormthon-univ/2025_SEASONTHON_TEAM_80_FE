@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
     SHARE: "/board/share",
     SHARED_BOARD: (shareUri: string) => `/board/share/${shareUri}`,
     INFO: "/board/info",
+    INFO_BY_SHARE_URI: (shareUri: string) => `/board/info/${shareUri}`,
     CREATE: "/board/create",
   },
 

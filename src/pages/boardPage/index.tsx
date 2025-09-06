@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getSharedBoard } from "@/apis/board";
+import { getBoardShare, getSharedBoard } from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
 import ShelfBg from "@/assets/bg_shelf.webp";
 import BoardNoteIcon from "@/assets/ic_board_note.svg?react";
@@ -15,6 +15,7 @@ import StampWebp from "@/assets/ic_stamp.webp";
 import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
+import { Sidebar } from "@/components/ui/sidebar";
 
 function BoardPage() {
   const { shareUri } = useParams();
@@ -27,11 +28,18 @@ function BoardPage() {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [ownerNickname, setOwnerNickname] = useState<string>("닉네임");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { data: sharedBoardData } = useQuery({
     queryKey: ["sharedBoard", shareUri, currentPage],
     queryFn: () => getSharedBoard(shareUri!, currentPage, 10),
     enabled: isSharedBoard && Boolean(shareUri),
+  });
+
+  const { data: currentUserBoard } = useQuery({
+    queryKey: ["currentUserBoard"],
+    queryFn: () => getBoardShare(),
+    enabled: !isSharedBoard,
   });
 
   useEffect(() => {
@@ -137,7 +145,13 @@ function BoardPage() {
       <div className="absolute top-[20px] left-[20px]">
         <HeaderIcon />
       </div>
-      <HamburgerIcon className="absolute top-[20px] right-[20px]" />
+      <button
+        type="button"
+        onClick={() => setIsSidebarOpen(true)}
+        className="absolute top-[20px] right-[20px] z-10 cursor-pointer"
+      >
+        <HamburgerIcon />
+      </button>
 
       {/* decorative frame image: top 99px, flush left */}
       <img
@@ -460,6 +474,30 @@ function BoardPage() {
           shareUri={shareUri}
         />
       </div>
+
+      {/* Sidebar */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <button
+            type="button"
+            className="flex-1 bg-black bg-opacity-50"
+            onClick={() => setIsSidebarOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setIsSidebarOpen(false);
+              }
+            }}
+            aria-label="사이드바 닫기"
+          />
+          <Sidebar
+            nickname={ownerNickname}
+            onClose={() => setIsSidebarOpen(false)}
+            shareUri={
+              isSharedBoard ? shareUri : currentUserBoard?.data?.shareUri
+            }
+          />
+        </div>
+      )}
     </div>
   );
 }

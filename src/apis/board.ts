@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from "@/apis/config/endpoints";
 import { apiGet, apiPost } from "@/lib/api";
 import type {
+  BoardInfoResponse,
   CreateBoardRequest,
   CreateBoardResponse,
   GetBoardShareResponse,
@@ -33,5 +34,13 @@ export const getSharedBoard = async (
   });
   return apiGet<SharedBoardResponse>(
     `${API_ENDPOINTS.BOARD.SHARED_BOARD(shareUri)}?${params.toString()}`
+  );
+};
+
+export const getBoardInfo = async (
+  shareUri: string
+): Promise<BoardInfoResponse> => {
+  return apiGet<BoardInfoResponse>(
+    API_ENDPOINTS.BOARD.INFO_BY_SHARE_URI(shareUri)
   );
 };

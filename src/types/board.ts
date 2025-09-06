@@ -35,3 +35,17 @@ export interface SharedBoardResponse {
 export interface SharedBoardInfo {
   nickname: string;
 }
+
+export interface BoardInfoData {
+  name: string;
+  profileImage: string;
+  messageCount: number;
+  serverTime: string;
+}
+
+export interface BoardInfoResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: BoardInfoData;
+}
