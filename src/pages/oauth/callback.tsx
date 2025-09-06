@@ -1,4 +1,3 @@
-// src/pages/oauth/callback.tsx - 백엔드 OAuth 방식
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getBoardShare } from "@/apis/board";
