@@ -60,9 +60,9 @@ function LoginPage() {
       </div>
 
       {/* 하단 요소들 - 하단에서부터 위로 배치 */}
-      <div className="flex flex-col-reverse items-center pb-10">
+      <div className="flex flex-col-reverse items-center justify-center pb-10">
         {/* 카카오 로그인 버튼 */}
-        <div className="w-full max-w-sm">
+        <div className="flex w-full justify-center">
           <KakaoLoginButton onClick={handleKakaoLogin} />
         </div>
 
