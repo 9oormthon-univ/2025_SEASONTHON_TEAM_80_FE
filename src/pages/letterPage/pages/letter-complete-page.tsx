@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import AirplaneBackground from "@/assets/bg_airplane.webp";
 import AirplaneObject from "@/assets/obj_airplane.webp";
 import SwooshObject from "@/assets/obj_swoosh.webp";
 import { NavigationButton } from "@/components/ui/navigation-button";
 export default function LetterCompletePage() {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const { shareUri } = useParams();
+
+  const isJoinPage = location.pathname.startsWith("/join/");
+  const isFirstTimeJoin = location.pathname === "/join/complete";
 
   const handleToHome = () => {
     navigate("/");
@@ -21,9 +24,17 @@ export default function LetterCompletePage() {
   return (
     <div className="dynamic-padding-top relative flex h-full w-full flex-col min-[451px]:md:pt-48 min-[451px]:sm:pt-44">
       <p className="mt-3 text-center font-primary text-[32px] text-red-200 leading-12">
-        마음이 담긴 첫 곡이 <br />
-        성공적으로 전송됐어요. <br />
-        우리도 만들어볼까요?
+        {isFirstTimeJoin ? (
+          "나만의 LP 보드가 만들어졌어요! 지금 확인하러 갈까요?"
+        ) : isJoinPage ? (
+          "나만의 LP 보드가 만들어졌어요! 지금 확인하러 갈까요?"
+        ) : (
+          <>
+            마음이 담긴 첫 곡이 <br />
+            성공적으로 전송됐어요. <br />
+            우리도 만들어볼까요?
+          </>
+        )}
       </p>
 
       <div className="relative flex-1 justify-center">

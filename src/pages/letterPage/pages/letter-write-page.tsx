@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getBoardInfo } from "@/apis/board";
 import { postMessage } from "@/apis/message";
 import LetterPaperBg from "@/assets/bg_letterpaper.webp";
 import SideDiskIcon from "@/assets/ic_side_disk.svg?react";
@@ -13,10 +14,15 @@ import LetterStep from "../components/letter-step";
 export default function LetterWritePage() {
   const navigate = useNavigate();
   const { shareUri } = useParams();
+  const location = useLocation();
+
+  const isJoinPage = location.pathname.startsWith("/join/");
+  const isFirstTimeJoin = location.pathname === "/join/letter/write";
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [letterContent, setLetterContent] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [albumImageUrl, setAlbumImageUrl] = useState<string | null>(null);
+  const [recipientNickname, setRecipientNickname] = useState("닉네임");
 
   const LOCALSTORAGE_KEY = "messageDraft";
 
@@ -33,6 +39,20 @@ export default function LetterWritePage() {
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    const fetchBoardInfo = async () => {
+      if (!shareUri) return;
+      try {
+        const response = await getBoardInfo(shareUri);
+        setRecipientNickname(response.data.name);
+      } catch (error) {
+        console.error("Failed to fetch board info:", error);
+      }
+    };
+
+    fetchBoardInfo();
+  }, [shareUri]);
 
   const isFormValid =
     letterContent.trim() !== "" &&
@@ -73,9 +93,19 @@ export default function LetterWritePage() {
         // on success, remove draft
         localStorage.removeItem(LOCALSTORAGE_KEY);
 
-        navigate(
-          shareUri ? `/letter/complete/${shareUri}` : "/letter/complete"
-        );
+        if (isJoinPage) {
+          if (isFirstTimeJoin) {
+            navigate("/join/complete");
+          } else {
+            navigate(
+              shareUri ? `/letter/complete/${shareUri}` : "/letter/complete"
+            );
+          }
+        } else {
+          navigate(
+            shareUri ? `/letter/complete/${shareUri}` : "/letter/complete"
+          );
+        }
       } catch (err) {
         // keep draft in storage on failure; optionally show error
         // eslint-disable-next-line no-console
@@ -92,10 +122,21 @@ export default function LetterWritePage() {
     <>
       <PageLayout
         title={
-          <>
-            노래랑 함께 보낼 <br />
-            마음을 작성해봐요.
-          </>
+          isFirstTimeJoin ? (
+            <>
+              가장 수고한 당신에게 <br /> 편지 한 통을 써주세요.
+            </>
+          ) : isJoinPage ? (
+            <>
+              가장 수고한 당신에게
+              <br /> 편지 한 통을 써주세요.
+            </>
+          ) : (
+            <>
+              노래랑 함께 보낼 <br />
+              마음을 작성해봐요.
+            </>
+          )
         }
         bottomContent={
           <NavigationButton
@@ -137,7 +178,7 @@ export default function LetterWritePage() {
         <div className="dynamic-bottom-position absolute z-20 h-[294px] w-[294px] px-5 py-5">
           {/* To. 닉네임 - 좌측 상단 */}
           <div className="absolute top-5 left-5 font-letter text-black text-xs">
-            To. 닉네임
+            To. {recipientNickname}
           </div>
           <img
             src={StampWebp}

@@ -1,4 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { getBoardInfo } from "@/apis/board";
 import PlayIcon from "@/assets/ic_play.svg?react";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { PageLayout } from "@/components/ui/page-layout";
@@ -16,17 +18,56 @@ export default function LetterSelectPage({
 }: LetterSelectPageProps) {
   const navigate = useNavigate();
   const { shareUri } = useParams();
+  const location = useLocation();
+  const [recipientNickname, setRecipientNickname] = useState(nickname);
+
+  const isJoinPage = location.pathname.startsWith("/join/");
+  const isFirstTimeJoin = location.pathname === "/join/letter/select";
+
+  useEffect(() => {
+    const fetchBoardInfo = async () => {
+      if (!shareUri) return;
+      try {
+        const response = await getBoardInfo(shareUri);
+        setRecipientNickname(response.data.name);
+      } catch (error) {
+        console.error("Failed to fetch board info:", error);
+      }
+    };
+
+    fetchBoardInfo();
+  }, [shareUri]);
 
   const handleClick = () => {
-    navigate(shareUri ? `/letter/write/${shareUri}` : "/letter/write");
+    if (isJoinPage) {
+      if (isFirstTimeJoin) {
+        navigate("/join/letter/write");
+      } else {
+        navigate(
+          shareUri ? `/join/letter/write/${shareUri}` : "/join/letter/write"
+        );
+      }
+    } else {
+      navigate(shareUri ? `/letter/write/${shareUri}` : "/letter/write");
+    }
   };
 
   return (
     <PageLayout
       title={
-        <>
-          {nickname} 님께 <br />이 노래를 들려드릴까요?
-        </>
+        isFirstTimeJoin ? (
+          <>
+            미래의 나에게 <br />이 노래를 들려드릴까요?{" "}
+          </>
+        ) : isJoinPage ? (
+          <>
+            미래의 나에게 <br /> 이 노래를 들려드릴까요?
+          </>
+        ) : (
+          <>
+            {recipientNickname} 님께 <br />이 노래를 들려드릴까요?
+          </>
+        )
       }
       bottomContent={
         <NavigationButton

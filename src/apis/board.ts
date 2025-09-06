@@ -2,6 +2,8 @@ import { API_ENDPOINTS } from "@/apis/config/endpoints";
 import { apiGet, apiPost } from "@/lib/api";
 import type {
   BoardInfoResponse,
+  BoardListResponse,
+  BoardMessageResponse,
   CreateBoardRequest,
   CreateBoardResponse,
   GetBoardShareResponse,
@@ -43,4 +45,20 @@ export const getBoardInfo = async (
   return apiGet<BoardInfoResponse>(
     API_ENDPOINTS.BOARD.INFO_BY_SHARE_URI(shareUri)
   );
+};
+
+export const getBoardDetail = async (
+  messageId: string
+): Promise<BoardMessageResponse> => {
+  return apiGet<BoardMessageResponse>(API_ENDPOINTS.BOARD.DETAIL(messageId));
+};
+
+export const getBoardList = async (
+  page = 0,
+  size = 10,
+  sort = "desc"
+): Promise<BoardListResponse> => {
+  const body = { page, size, sort: [sort] } as unknown as object;
+  // backend expects POST body with pagination options; respond with wrapper { success, code, message, data }
+  return apiPost<BoardListResponse, object>(API_ENDPOINTS.BOARD.LIST, body);
 };

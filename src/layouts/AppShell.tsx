@@ -11,11 +11,18 @@ export default function AppShell({ children }: PropsWithChildren) {
       ([key]) => key !== "/" && pathname.startsWith(key)
     )?.[1];
 
-  const isLetterSearch = pathname === "/letter/search";
-  const isLetterWrite = pathname === "/letter/write";
+  const isLetterSearch =
+    pathname === "/letter/search" ||
+    pathname.startsWith("/join/letter/search") ||
+    pathname.startsWith("/letter/search");
   const isErrorPage =
-    !routeBg[pathname] && pathname !== "/letter/search" && pathname !== "/";
-  const shouldRemovePadding = isLetterSearch || isLetterWrite || isErrorPage;
+    !routeBg[pathname] &&
+    !Object.entries(routeBg).find(
+      ([key]) => key !== "/" && pathname.startsWith(key)
+    ) &&
+    pathname !== "/letter/search" &&
+    pathname !== "/";
+  const shouldRemovePadding = isLetterSearch || isErrorPage;
 
   return (
     <div
