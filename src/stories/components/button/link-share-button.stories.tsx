@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { MemoryRouter } from "react-router-dom";
 import { fn } from "storybook/test";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 
@@ -19,6 +20,13 @@ const meta = {
       description: "버튼 비활성화 상태",
     },
   },
+  decorators: [
+    (Story) => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
   args: { onClick: fn() },
 } satisfies Meta<typeof LinkShareButton>;
 
