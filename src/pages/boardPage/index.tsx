@@ -34,6 +34,7 @@ function BoardPage() {
   const shelfRef = useRef<HTMLImageElement | null>(null);
   const frameRef = useRef<HTMLImageElement | null>(null);
   const shelfWrapperRef = useRef<HTMLDivElement | null>(null);
+  const bottomGroupRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -177,6 +178,20 @@ function BoardPage() {
     { id: 12, x: 265, y: 290 },
   ];
 
+  // adjust positions based on screen width
+  const getAdjustedPositions = () => {
+    if (screenWidth <= 400) {
+      // reduce spacing for small screens
+      const scale = Math.max(0.8, (screenWidth / 400) * 0.9); // minimum 80% scale
+      return ORIGINAL_POS.map((pos) => ({
+        ...pos,
+        x: Math.round(pos.x * scale),
+        y: Math.round(pos.y * scale),
+      }));
+    }
+    return ORIGINAL_POS;
+  };
+
   // align pocket/hat coords to existing ORIGINAL_POS entries so they render
   const POCKET_COORD = { x: 175, y: 102 };
   const HAT_COORD = { x: 0, y: 200 };
@@ -185,14 +200,22 @@ function BoardPage() {
     x: 0,
     y: 0,
   });
+  // horizontal offset to center the album grid inside the shelf image
+  const [contentLeft, setContentLeft] = useState<number>(0);
+  // track screen width for responsive layout
+  const [screenWidth, setScreenWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 400
+  );
   const GLOBAL_DOWN_PX = 0; // removed top margin
-  const GLOBAL_LEFT_PX = 0; // removed left margin
+  const GLOBAL_LEFT_PX = -16; // shift everything 8px left
   const [timeRemaining, setTimeRemaining] = useState({
     d: 0,
     h: 0,
     m: 0,
     s: 0,
   });
+  // measured height of the fixed bottom group (pagination + share button)
+  const [bottomGroupHeight, setBottomGroupHeight] = useState<number>(0);
   const [frameCenter, setFrameCenter] = useState<{ x: number; y: number }>({
     x: 0,
     y: 0,
@@ -240,14 +263,29 @@ function BoardPage() {
     if (!img || !wrap) return;
     const rect = img.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
-
     const shiftPct = 6;
     const shiftX = Math.round((rect.width * shiftPct) / 100);
     const shiftY = Math.round((rect.height * shiftPct) / 100);
 
-    setShiftPx({ x: shiftX, y: shiftY });
-  }, []);
+    // update screen width
+    setScreenWidth(window.innerWidth);
 
+    // estimate width of album grid based on screen size
+    const currentScreenWidth = window.innerWidth;
+    const scale =
+      currentScreenWidth <= 400
+        ? Math.max(0.7, (currentScreenWidth / 400) * 0.8)
+        : 1;
+    const ALBUM_MAX_X = 265 * scale;
+    const ALBUM_WIDTH = 60; // placeholder width used in layout
+    const contentWidth = ALBUM_MAX_X + ALBUM_WIDTH;
+
+    // center the album grid across the full shelf width
+    const leftOffset = Math.max(0, Math.round((rect.width - contentWidth) / 2));
+
+    setShiftPx({ x: shiftX, y: shiftY });
+    setContentLeft(leftOffset);
+  }, []);
   const computeFrameCenter = useCallback(() => {
     const img = frameRef.current;
     if (!img) return;
@@ -267,6 +305,25 @@ function BoardPage() {
       window.removeEventListener("resize", computeFrameCenter);
     };
   }, [computeShift, computeFrameCenter]);
+
+  // measure bottom group's height and update padding
+  useEffect(() => {
+    const el = bottomGroupRef.current;
+    if (!el) return;
+
+    const update = () =>
+      setBottomGroupHeight(el.getBoundingClientRect().height);
+
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   useEffect(() => {
     // recompute frame center when needed
@@ -330,19 +387,22 @@ function BoardPage() {
   ]);
 
   return (
-    <div className="relative flex min-h-screen flex-col pb-[77px]">
-      <div className="absolute top-[20px] left-[20px]">
+    <div
+      className="relative flex min-h-screen flex-col"
+      style={{ paddingTop: 140, paddingBottom: 96 + bottomGroupHeight }}
+    >
+      <div className="fixed top-[20px] left-[12px] z-40">
         <HeaderIcon />
       </div>
       <button
         type="button"
         onClick={() => setIsSidebarOpen(true)}
-        className="absolute top-[20px] right-[20px] z-10 cursor-pointer"
+        className="fixed top-[20px] right-[20px] z-40 cursor-pointer"
       >
         <HamburgerIcon />
       </button>
 
-      {/* decorative frame image: top 99px, flush left */}
+      {/* decorative frame image: moved up to sit higher on the page */}
       <img
         ref={frameRef}
         src={FrameImg}
@@ -355,7 +415,7 @@ function BoardPage() {
             window.dispatchEvent(ev);
           }, 0);
         }}
-        style={{ position: "absolute", top: 99, left: 0 }}
+        style={{ position: "absolute", top: 60, left: 0 }}
       />
 
       {/* avatar centered on the frame */}
@@ -371,7 +431,7 @@ function BoardPage() {
           height: 36,
           borderRadius: 18,
           objectFit: "cover",
-          zIndex: 30,
+          zIndex: 40,
           pointerEvents: "none",
         }}
       />
@@ -379,10 +439,11 @@ function BoardPage() {
       {/* fixed-server countdown to next Jan 1 */}
       <div
         style={{
-          position: "absolute",
+          position: "fixed",
           left: "50%",
           transform: "translateX(-50%)",
           top: 26,
+          zIndex: 40,
         }}
       >
         <span className="text-[12px] text-brown-100">
@@ -394,7 +455,7 @@ function BoardPage() {
         ref={containerRef}
         className="relative flex w-full flex-1 flex-col items-center justify-end"
       >
-        <div className="absolute top-20 left-[155px] mt-[20px]">
+        <div className="fixed top-20 left-[147px] z-40 mt-[20px]">
           <div className="flex items-center gap-3">
             <span className="font-primary text-[20px] text-brown-100">
               {ownerNickname} 님의 LP 보드
@@ -437,17 +498,25 @@ function BoardPage() {
             alt="shelf"
           />
 
-          {ORIGINAL_POS.map((orig) => {
+          {getAdjustedPositions().map((orig) => {
             const id = orig.id;
             // pocket
-            if (orig.x === POCKET_COORD.x && orig.y === POCKET_COORD.y) {
+            if (
+              ORIGINAL_POS.find((p) => p.id === id)?.x === POCKET_COORD.x &&
+              ORIGINAL_POS.find((p) => p.id === id)?.y === POCKET_COORD.y
+            ) {
               return (
                 <div
                   key={`lucky-${id}`}
                   style={{
                     position: "absolute",
                     left:
-                      orig.x + shiftPx.x + POCKET_OFFSET.x - 3 + GLOBAL_LEFT_PX,
+                      contentLeft +
+                      orig.x +
+                      shiftPx.x +
+                      POCKET_OFFSET.x -
+                      3 +
+                      GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + POCKET_OFFSET.y + GLOBAL_DOWN_PX,
                     width: 78,
                     height: 78,
@@ -459,13 +528,16 @@ function BoardPage() {
             }
 
             // hat
-            if (orig.x === HAT_COORD.x && orig.y === HAT_COORD.y) {
+            if (
+              ORIGINAL_POS.find((p) => p.id === id)?.x === HAT_COORD.x &&
+              ORIGINAL_POS.find((p) => p.id === id)?.y === HAT_COORD.y
+            ) {
               return (
                 <div
                   key={`hat-${id}`}
                   style={{
                     position: "absolute",
-                    left: orig.x + shiftPx.x + GLOBAL_LEFT_PX,
+                    left: contentLeft + orig.x + shiftPx.x + GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + GLOBAL_DOWN_PX,
                     width: 68,
                     height: 100,
@@ -508,7 +580,7 @@ function BoardPage() {
                   src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
                   style={{
                     position: "absolute",
-                    left: orig.x + shiftPx.x + GLOBAL_LEFT_PX,
+                    left: contentLeft + orig.x + shiftPx.x + GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + GLOBAL_DOWN_PX,
                     width: 60,
                     height: 60,
@@ -529,7 +601,12 @@ function BoardPage() {
                   style={{
                     position: "absolute",
                     left:
-                      orig.x + shiftPx.x + coverOffsetPx + 2 + GLOBAL_LEFT_PX,
+                      contentLeft +
+                      orig.x +
+                      shiftPx.x +
+                      coverOffsetPx +
+                      2 +
+                      GLOBAL_LEFT_PX,
                     top: orig.y + shiftPx.y + GLOBAL_DOWN_PX + coverOffsetPx,
                     width: 48,
                     height: 48,
@@ -783,29 +860,40 @@ function BoardPage() {
             </div>
           )}
         </div>
-        <div className="mb-24">
-          <Pagination
-            totalPages={
-              isSharedBoard && sharedBoardData
-                ? sharedBoardData.totalPages
-                : totalPages
-            }
-            initialPage={currentPage + 1}
-            onPageChange={(page) => setCurrentPage(page - 1)}
-          />
-        </div>
       </div>
 
-      <div className="fixed right-0 bottom-0 left-0 flex justify-center">
-        <LinkShareButton
-          label={
-            isSharedBoard ? `${ownerNickname}님에게 마음 전달하기` : "링크 공유"
-          }
-          Icon={LinkIcon}
-          className="w-full max-w-[450px]"
-          isSharedBoard={isSharedBoard}
-          shareUri={shareUri}
-        />
+      {/* Fixed bottom group: pagination above the share button */}
+      <div
+        className="pointer-events-none fixed right-0 bottom-0 left-0 z-40 flex justify-center"
+        style={{ padding: 12 }}
+      >
+        <div className="pointer-events-auto flex w-full max-w-[450px] flex-col items-center gap-4">
+          <div style={{ width: "100%" }}>
+            <Pagination
+              totalPages={
+                isSharedBoard && sharedBoardData
+                  ? sharedBoardData.totalPages
+                  : totalPages
+              }
+              initialPage={currentPage + 1}
+              onPageChange={(page) => setCurrentPage(page - 1)}
+            />
+          </div>
+
+          <div style={{ width: "100%" }}>
+            <LinkShareButton
+              label={
+                isSharedBoard
+                  ? `${ownerNickname}님에게 마음 전달하기`
+                  : "링크 공유"
+              }
+              Icon={LinkIcon}
+              className="w-full"
+              isSharedBoard={isSharedBoard}
+              shareUri={shareUri}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Sidebar */}
