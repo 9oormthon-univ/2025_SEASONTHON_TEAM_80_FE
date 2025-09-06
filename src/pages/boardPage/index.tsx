@@ -18,7 +18,6 @@ import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
 import { Sidebar } from "@/components/ui/sidebar";
 import type { BoardListItem, SharedBoardMessage } from "@/types/board";
-import type { Song } from "@/types/song";
 
 function BoardPage() {
   const { shareUri } = useParams();
@@ -33,7 +32,7 @@ function BoardPage() {
   const [ownerNickname, setOwnerNickname] = useState<string>("닉네임");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [boardList, setBoardList] = useState<BoardListItem[]>([]);
-  const [boardTotalElements, setBoardTotalElements] = useState<number>(0);
+  const [, setBoardTotalElements] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const { data: sharedBoardData } = useQuery({
