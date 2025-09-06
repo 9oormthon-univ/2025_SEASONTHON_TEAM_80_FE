@@ -11,5 +11,8 @@ export const ROUTES = {
     WRITE: "/letter/write",
     COMPLETE: "/letter/complete",
   },
+  OAUTH: {
+    CALLBACK: "/login/oauth2/code/kakao",
+  },
   ERROR: "*",
 } as const;

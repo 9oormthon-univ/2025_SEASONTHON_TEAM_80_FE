@@ -1,9 +1,22 @@
 import LogoIcon from "@/assets/ic_logo.svg?react";
 import StarIcon from "@/assets/ic_star.svg?react";
+import { getKakaoLoginURL } from "@/lib/kakaoAuth";
 import { DDayCounter } from "@/pages/loginPage/components/dday-counter";
 import { KakaoLoginButton } from "@/pages/loginPage/components/kakao-login-button";
 
 function LoginPage() {
+  const handleKakaoLogin = () => {
+    try {
+      const kakaoLoginURL = getKakaoLoginURL();
+      console.log("카카오 로그인 URL:", kakaoLoginURL);
+
+      window.location.href = `${import.meta.env.VITE_SERVER_URL}/oauth2/authorization/kakao`;
+    } catch (error) {
+      console.error("카카오 로그인 URL 생성 실패:", error);
+      alert("로그인 처리 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div
       className="relative flex min-h-screen flex-col"
@@ -54,9 +67,7 @@ function LoginPage() {
       <div className="flex flex-col-reverse items-center pb-10">
         {/* 카카오 로그인 버튼 */}
         <div className="w-full max-w-sm">
-          <KakaoLoginButton
-            onClick={() => console.log("카카오 로그인 클릭!")}
-          />
+          <KakaoLoginButton onClick={handleKakaoLogin} />
         </div>
 
         {/* 디데이 표기 창 */}

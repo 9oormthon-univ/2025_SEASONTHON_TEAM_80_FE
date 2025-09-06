@@ -1,13 +1,34 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createBoard } from "@/apis/board";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { NicknameInput } from "@/components/ui/nickname-input";
 import { PageLayout } from "@/components/ui/page-layout";
+import { ROUTES } from "@/constants/routes";
 
 export default function JoinNicknamePage() {
   const [nickname, setNickname] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const isNicknameValid =
     nickname.trim().length > 0 && nickname.trim().length <= 6;
+
+  const handleCreateBoard = async () => {
+    if (!isNicknameValid || isLoading) return;
+
+    try {
+      setIsLoading(true);
+      const response = await createBoard({ nickname: nickname.trim() });
+      console.log("보드 생성 성공:", response);
+      navigate(ROUTES.JOIN.COMPLETE);
+    } catch (error) {
+      console.error("보드 생성 API 에러:", error);
+      alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <PageLayout
@@ -23,11 +44,12 @@ export default function JoinNicknamePage() {
       bottomContent={
         <NavigationButton
           className="w-full"
-          active={isNicknameValid}
-          disabled={!isNicknameValid}
-          aria-disabled={!isNicknameValid}
+          active={isNicknameValid && !isLoading}
+          disabled={!isNicknameValid || isLoading}
+          aria-disabled={!isNicknameValid || isLoading}
+          onClick={handleCreateBoard}
         >
-          다음으로
+          {isLoading ? "보드 생성 중..." : "다음으로"}
         </NavigationButton>
       }
     >

@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import OAuthCallback from "@/pages/oauth/callback";
 import { ROUTES } from "../constants/routes";
 import {
   ErrorPage,
@@ -16,6 +17,7 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path={ROUTES.HOME} element={<LoginPage />} />
+      <Route path={ROUTES.OAUTH.CALLBACK} element={<OAuthCallback />} />
       <Route path={ROUTES.JOIN.NICKNAME} element={<JoinNicknamePage />} />
       <Route path={ROUTES.JOIN.COMPLETE} element={<JoinCompletePage />} />
       <Route path={ROUTES.LETTER.GUIDE} element={<LetterGuidePage />} />
