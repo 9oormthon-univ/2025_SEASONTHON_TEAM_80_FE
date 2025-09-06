@@ -60,7 +60,6 @@ export const getBoardList = async (
   size = 10,
   sort = "desc"
 ): Promise<BoardListResponse> => {
-  const body = { page, size, sort: [sort] } as unknown as object;
-  // backend expects POST body with pagination options; respond with wrapper { success, code, message, data }
-  return apiPost<BoardListResponse, object>(API_ENDPOINTS.BOARD.LIST, body);
+  const body = { page, size, sort } as unknown as object;
+  return apiGet<BoardListResponse, object>(API_ENDPOINTS.BOARD.LIST, body);
 };
