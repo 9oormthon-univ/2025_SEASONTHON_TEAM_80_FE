@@ -9,6 +9,7 @@ import PersonIcon from "@/assets/ic_person.svg?react";
 import SignOutIcon from "@/assets/ic_sign_out.svg?react";
 import VideoIcon from "@/assets/ic_video.svg?react";
 import XIcon from "@/assets/ic_x.svg?react";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   nickname?: string;
@@ -27,6 +28,8 @@ export function Sidebar({
     enabled: Boolean(shareUri),
   });
 
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -35,6 +38,11 @@ export function Sidebar({
       console.error("로그아웃 실패:", error);
     }
   };
+
+  const handleNavigateProfile = () => {
+    navigate("/user/profile");
+  };
+
   return (
     <div className="relative h-dvh w-72 flex-shrink-0 overflow-hidden rounded-tl-[10px] rounded-bl-[10px] bg-neutral-100">
       <div className="mx-[14px] my-[14px] flex h-[calc(100dvh-28px)] w-52 flex-col">
@@ -80,7 +88,11 @@ export function Sidebar({
           <div className="flex flex-col gap-3">
             <div className="h-0 w-60 outline outline-[#E6E6E6] outline-offset-[-0.50px]" />
             <div className="flex flex-col">
-              <div className="flex h-12 items-center gap-3 overflow-hidden py-2">
+              <button
+                type="button"
+                onClick={handleNavigateProfile}
+                className="flex h-12 w-full items-center gap-3 overflow-hidden py-2 text-left transition-colors hover:bg-neutral-200"
+              >
                 <div className="relative h-10 w-10">
                   <div className="h-10 w-10 rounded-full bg-red-900/5 backdrop-blur-[9.75px]" />
                   <PersonIcon className="absolute top-[10px] left-[10px] h-5 w-5" />
@@ -88,7 +100,7 @@ export function Sidebar({
                 <div className="font-semibold text-base text-neutral-800 leading-snug tracking-wide">
                   마이 프로필
                 </div>
-              </div>
+              </button>
               <div className="flex h-12 items-center gap-3 overflow-hidden py-2">
                 <div className="relative h-10 w-10">
                   <div className="h-10 w-10 rounded-full bg-red-900/5 backdrop-blur-[9.75px]" />

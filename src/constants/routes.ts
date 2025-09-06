@@ -24,5 +24,8 @@ export const ROUTES = {
   OAUTH: {
     CALLBACK: "/login/oauth2/code/kakao",
   },
+  USER: {
+    PROFILE: "/user/profile",
+  },
   ERROR: "*",
 } as const;

@@ -15,6 +15,7 @@ export default function AppShell({ children }: PropsWithChildren) {
     pathname === "/letter/search" ||
     pathname.startsWith("/join/letter/search") ||
     pathname.startsWith("/letter/search");
+  const isUserPage = pathname.startsWith("/user");
   const isErrorPage =
     !routeBg[pathname] &&
     !Object.entries(routeBg).find(
@@ -22,7 +23,7 @@ export default function AppShell({ children }: PropsWithChildren) {
     ) &&
     pathname !== "/letter/search" &&
     pathname !== "/";
-  const shouldRemovePadding = isLetterSearch || isErrorPage;
+  const shouldRemovePadding = isLetterSearch || isErrorPage || isUserPage;
 
   return (
     <div

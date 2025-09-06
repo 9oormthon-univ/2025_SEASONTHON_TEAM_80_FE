@@ -8,3 +8,4 @@ export { default as MusicSearchPage } from "./letterPage/pages/letter-search-pag
 export { default as LetterSelectPage } from "./letterPage/pages/letter-select-page";
 export { default as LetterWritePage } from "./letterPage/pages/letter-write-page";
 export { default as LoginPage } from "./loginPage";
+export { default as UserProfilePage } from "./userPage/pages/user-profile-page";

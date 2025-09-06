@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
 import OAuthCallback from "@/pages/oauth/callback";
+import UserProfilePage from "@/pages/userPage/pages/user-profile-page";
 import { ROUTES } from "../constants/routes";
 import {
   BoardPage,
@@ -97,6 +98,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute requireBoard={false}>
             <JoinCompletePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.USER.PROFILE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <UserProfilePage />
           </ProtectedRoute>
         }
       />
