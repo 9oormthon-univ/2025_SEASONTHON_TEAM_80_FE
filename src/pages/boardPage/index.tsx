@@ -90,7 +90,6 @@ function BoardPage() {
     enabled: Boolean(computedShareUri),
   });
 
-
   // fetch current user's board list (paginated) when not viewing a shared board
   const { data: currentUserBoardList } = useQuery({
     queryKey: ["currentUserBoardList", currentPage],
@@ -103,10 +102,19 @@ function BoardPage() {
     const nameFromInfo = boardInfoQuery.data?.data?.name;
     if (nameFromInfo && nameFromInfo !== ownerNickname) {
       setOwnerNickname(nameFromInfo);
-    } else if (isSharedBoard && sharedBoardData?.nickname && sharedBoardData.nickname !== ownerNickname) {
+    } else if (
+      isSharedBoard &&
+      sharedBoardData?.nickname &&
+      sharedBoardData.nickname !== ownerNickname
+    ) {
       setOwnerNickname(sharedBoardData.nickname);
     }
-  }, [boardInfoQuery.data?.data?.name, sharedBoardData?.nickname, isSharedBoard, ownerNickname]);
+  }, [
+    boardInfoQuery.data?.data?.name,
+    sharedBoardData?.nickname,
+    isSharedBoard,
+    ownerNickname,
+  ]);
 
   useEffect(() => {
     // handle shared board data
@@ -127,7 +135,7 @@ function BoardPage() {
       setBoardTotalElements(sharedBoardData.totalElements ?? 0);
     }
   }, [isSharedBoard, sharedBoardData]);
-  
+
   useEffect(() => {
     // handle current user board data
     if (!isSharedBoard && currentUserBoardList) {
