@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import OAuthCallback from "@/pages/oauth/callback";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
+import OAuthCallback from "@/pages/oauth/callback";
 import { ROUTES } from "../constants/routes";
 import {
   BoardPage,
