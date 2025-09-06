@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PlayIcon from "@/assets/ic_play.svg?react";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { PageLayout } from "@/components/ui/page-layout";
@@ -15,9 +15,10 @@ export default function LetterSelectPage({
   song,
 }: LetterSelectPageProps) {
   const navigate = useNavigate();
+  const { shareUri } = useParams();
 
   const handleClick = () => {
-    navigate("/letter/write");
+    navigate(shareUri ? `/letter/write/${shareUri}` : "/letter/write");
   };
 
   return (

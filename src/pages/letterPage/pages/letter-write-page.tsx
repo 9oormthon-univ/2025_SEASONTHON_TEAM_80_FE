@@ -1,18 +1,38 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { postMessage } from "@/apis/message";
 import LetterPaperBg from "@/assets/bg_letterpaper.webp";
 import SideDiskIcon from "@/assets/ic_side_disk.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
 import { Alert } from "@/components/ui/alert";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { PageLayout } from "@/components/ui/page-layout";
+import type { MessageData } from "@/types/message";
 import LetterStep from "../components/letter-step";
 
 export default function LetterWritePage() {
   const navigate = useNavigate();
+  const { shareUri } = useParams();
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [letterContent, setLetterContent] = useState("");
   const [authorName, setAuthorName] = useState("");
+  const [albumImageUrl, setAlbumImageUrl] = useState<string | null>(null);
+
+  const LOCALSTORAGE_KEY = "messageDraft";
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(LOCALSTORAGE_KEY);
+      if (!stored) return;
+      const parsed: Partial<import("@/types/message").MessageData> =
+        JSON.parse(stored);
+      if (parsed.senderName) setAuthorName(parsed.senderName);
+      if (parsed.content) setLetterContent(parsed.content);
+      if (parsed.albumImageUrl) setAlbumImageUrl(parsed.albumImageUrl);
+    } catch (_e) {
+      // ignore
+    }
+  }, []);
 
   const isFormValid =
     letterContent.trim() !== "" &&
@@ -22,13 +42,46 @@ export default function LetterWritePage() {
 
   const handleSendClick = () => {
     if (isFormValid) {
+      try {
+        const stored = localStorage.getItem(LOCALSTORAGE_KEY);
+        const draft: Partial<MessageData> = stored ? JSON.parse(stored) : {};
+        draft.senderName = authorName;
+        draft.content = letterContent;
+        draft.shareUri = shareUri ?? draft.shareUri ?? "";
+        localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(draft));
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("Failed to save draft before confirm", err);
+      }
       setIsAlertOpen(true);
     }
   };
 
   const handleConfirm = () => {
     setIsAlertOpen(false);
-    navigate("/letter/complete");
+    (async () => {
+      try {
+        const stored = localStorage.getItem(LOCALSTORAGE_KEY);
+        const draft: Partial<MessageData> = stored ? JSON.parse(stored) : {};
+        draft.senderName = authorName;
+        draft.content = letterContent;
+        draft.shareUri = shareUri ?? draft.shareUri ?? "";
+
+        // POST to backend using central message api
+        await postMessage(draft);
+
+        // on success, remove draft
+        localStorage.removeItem(LOCALSTORAGE_KEY);
+
+        navigate(
+          shareUri ? `/letter/complete/${shareUri}` : "/letter/complete"
+        );
+      } catch (err) {
+        // keep draft in storage on failure; optionally show error
+        // eslint-disable-next-line no-console
+        console.error("Failed to send message", err);
+      }
+    })();
   };
 
   const handleCancel = () => {
@@ -67,7 +120,7 @@ export default function LetterWritePage() {
         {/* 음악 앨범 사진 */}
         <div className="-translate-y-[90.625px] dynamic-bottom-position absolute right-0 h-[108.75px] w-[108.75px] overflow-hidden rounded-md bg-gray-300">
           <img
-            src="/path/to/album-image.jpg"
+            src={albumImageUrl ?? "/path/to/album-image.jpg"}
             alt="앨범 커버"
             className="h-full w-full object-cover"
           />
@@ -96,7 +149,7 @@ export default function LetterWritePage() {
           <div className="mb-4 flex justify-end">
             <div className="h-[26px] w-[26px] overflow-hidden rounded-sm bg-gray-300">
               <img
-                src="/path/to/album-image.jpg"
+                src={albumImageUrl ?? "/path/to/album-image.jpg"}
                 alt="앨범 커버"
                 className="h-full w-full object-cover"
               />
