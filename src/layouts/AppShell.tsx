@@ -12,10 +12,12 @@ export default function AppShell({ children }: PropsWithChildren) {
     )?.[1];
 
   const isLetterSearch = pathname === "/letter/search";
-  const isLetterWrite = pathname === "/letter/write";
-  const isErrorPage =
-    !routeBg[pathname] && pathname !== "/letter/search" && pathname !== "/";
-  const shouldRemovePadding = isLetterSearch || isLetterWrite || isErrorPage;
+  const isErrorPage = 
+    !routeBg[pathname] && 
+    !Object.entries(routeBg).find(([key]) => key !== "/" && pathname.startsWith(key)) &&
+    pathname !== "/letter/search" && 
+    pathname !== "/";
+  const shouldRemovePadding = isLetterSearch || isErrorPage;
 
   return (
     <div
