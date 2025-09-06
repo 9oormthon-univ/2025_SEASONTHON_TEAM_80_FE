@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import OAuthCallback from "@/pages/oauth/callback";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
 import { ROUTES } from "../constants/routes";
 import {
   BoardPage,
@@ -19,8 +20,22 @@ export default function AppRoutes() {
     <Routes>
       <Route path={ROUTES.HOME} element={<LoginPage />} />
       <Route path={ROUTES.OAUTH.CALLBACK} element={<OAuthCallback />} />
-      <Route path={ROUTES.JOIN.NICKNAME} element={<JoinNicknamePage />} />
-      <Route path={ROUTES.JOIN.COMPLETE} element={<JoinCompletePage />} />
+      <Route
+        path={ROUTES.JOIN.NICKNAME}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <JoinNicknamePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.COMPLETE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <JoinCompletePage />
+          </ProtectedRoute>
+        }
+      />
       <Route path={ROUTES.LETTER.GUIDE} element={<LetterGuidePage />} />
       <Route path={ROUTES.LETTER.SEARCH} element={<MusicSearchPage />} />
       <Route path={ROUTES.LETTER.SELECT} element={<LetterSelectPage />} />
