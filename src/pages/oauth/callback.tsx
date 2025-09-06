@@ -21,7 +21,7 @@ export default function OAuthCallback() {
       try {
         const boardShareData = await getBoardShare();
 
-        if (boardShareData.boardId === null) {
+        if (boardShareData.data.boardId === null) {
           navigate("/join/nickname");
         } else {
           navigate("/board");

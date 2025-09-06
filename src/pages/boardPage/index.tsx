@@ -28,7 +28,7 @@ function BoardPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [ownerNickname, setOwnerNickname] = useState<string>("닉네임");
 
-  const { data: sharedBoardData, isLoading } = useQuery({
+  const { data: sharedBoardData } = useQuery({
     queryKey: ["sharedBoard", shareUri, currentPage],
     queryFn: () => getSharedBoard(shareUri!, currentPage, 10),
     enabled: isSharedBoard && Boolean(shareUri),
@@ -443,8 +443,8 @@ function BoardPage() {
             totalPages={
               isSharedBoard && sharedBoardData ? sharedBoardData.totalPages : 1
             }
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
+            initialPage={currentPage + 1}
+            onPageChange={(page) => setCurrentPage(page - 1)}
           />
         </div>
       </div>

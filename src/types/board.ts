@@ -10,8 +10,10 @@ export interface CreateBoardResponse {
 }
 
 export interface GetBoardShareResponse {
-  boardId: string | null;
-  shareUri: string;
+  data: {
+    boardId: string | null;
+    shareUri: string;
+  };
 }
 
 export interface SharedBoardMessage {

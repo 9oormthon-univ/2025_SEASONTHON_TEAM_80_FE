@@ -24,7 +24,6 @@ function LinkShareButton({
   onShareSuccess,
   onShareError,
   isSharedBoard = false,
-  shareUri,
   ...props
 }: LinkShareButtonProps) {
   const { shareBoard, isSharing } = useShare();
