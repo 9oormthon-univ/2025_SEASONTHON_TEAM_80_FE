@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getBoardList, getBoardShare, getSharedBoard, getBoardInfo } from "@/apis/board";
+import {
+  getBoardInfo,
+  getBoardList,
+  getBoardShare,
+  getSharedBoard,
+} from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
 import ShelfBg from "@/assets/bg_shelf.webp";
 import BoardNoteIcon from "@/assets/ic_board_note.svg?react";
@@ -13,8 +18,8 @@ import LinkIcon from "@/assets/ic_link.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
 import PlayIcon from "@/assets/ic_play.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
-import ObjLp from "@/assets/obj_lp.webp";
 import DefaultProfile from "@/assets/obj_default_profile.svg";
+import ObjLp from "@/assets/obj_lp.webp";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
 import { Sidebar } from "@/components/ui/sidebar";
@@ -53,7 +58,9 @@ function BoardPage() {
   // prefer route shareUri when present, otherwise use current user's shareUri
 
   // derive shareUri from possible shapes returned by getBoardShare()
-  const maybe = currentUserBoard as unknown as Record<string, unknown> | undefined;
+  const maybe = currentUserBoard as unknown as
+    | Record<string, unknown>
+    | undefined;
   const maybeData = maybe?.data as Record<string, unknown> | undefined;
 
   const shareUriFromCurrentUser =
@@ -84,7 +91,12 @@ function BoardPage() {
     if (boardInfoQuery.data) return;
     // trigger fetch
     void boardInfoQuery.refetch();
-  }, [computedShareUri, boardInfoQuery.isFetching, boardInfoQuery.data, boardInfoQuery.refetch]);
+  }, [
+    computedShareUri,
+    boardInfoQuery.isFetching,
+    boardInfoQuery.data,
+    boardInfoQuery.refetch,
+  ]);
 
   // fetch current user's board list (paginated) when not viewing a shared board
   useEffect(() => {
@@ -194,7 +206,8 @@ function BoardPage() {
 
   useEffect(() => {
     // use a fixed server time as requested
-  const serverTimeStr = boardInfoQuery?.data?.data?.serverTime ?? new Date().toISOString();
+    const serverTimeStr =
+      boardInfoQuery?.data?.data?.serverTime ?? new Date().toISOString();
     const serverNow = new Date(serverTimeStr);
     const startClient = Date.now();
 
@@ -404,7 +417,13 @@ function BoardPage() {
             >
               <BoardNoteIcon style={{ width: 12, height: 12 }} />
               <span className="ml-1 whitespace-nowrap font-bold">
-                총 {boardInfoQuery?.data?.data?.messageCount ?? (isSharedBoard ? sharedBoardData?.totalElements : boardTotalElements) ?? "00"} 개 음반
+                총{" "}
+                {boardInfoQuery?.data?.data?.messageCount ??
+                  (isSharedBoard
+                    ? sharedBoardData?.totalElements
+                    : boardTotalElements) ??
+                  "00"}{" "}
+                개 음반
               </span>
             </div>
           </div>
