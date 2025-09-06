@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getBoardList, getBoardShare, getSharedBoard } from "@/apis/board";
+import { getBoardList, getBoardShare, getSharedBoard, getBoardInfo } from "@/apis/board";
 import BgLetter from "@/assets/bg_letterpaper.webp";
 import ShelfBg from "@/assets/bg_shelf.webp";
 import BoardNoteIcon from "@/assets/ic_board_note.svg?react";
@@ -14,6 +14,7 @@ import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
 import PlayIcon from "@/assets/ic_play.svg?react";
 import StampWebp from "@/assets/ic_stamp.webp";
 import ObjLp from "@/assets/obj_lp.webp";
+import DefaultProfile from "@/assets/obj_default_profile.svg";
 import { LinkShareButton } from "@/components/ui/link-share-button";
 import { Pagination } from "@/components/ui/pagination";
 import { Sidebar } from "@/components/ui/sidebar";
@@ -26,6 +27,7 @@ function BoardPage() {
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const shelfRef = useRef<HTMLImageElement | null>(null);
+  const frameRef = useRef<HTMLImageElement | null>(null);
   const shelfWrapperRef = useRef<HTMLDivElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,7 +35,7 @@ function BoardPage() {
   const [ownerNickname, setOwnerNickname] = useState<string>("닉네임");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [boardList, setBoardList] = useState<BoardListItem[]>([]);
-  const [, setBoardTotalElements] = useState<number>(0);
+  const [boardTotalElements, setBoardTotalElements] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const { data: sharedBoardData } = useQuery({
@@ -47,6 +49,42 @@ function BoardPage() {
     queryFn: () => getBoardShare(),
     enabled: !isSharedBoard,
   });
+
+  // prefer route shareUri when present, otherwise use current user's shareUri
+
+  // derive shareUri from possible shapes returned by getBoardShare()
+  const maybe = currentUserBoard as unknown as Record<string, unknown> | undefined;
+  const maybeData = maybe?.data as Record<string, unknown> | undefined;
+
+  const shareUriFromCurrentUser =
+    // standard typed shape
+    (currentUserBoard as unknown as { data?: { shareUri?: string } })?.data
+      ?.shareUri ??
+    // top-level or alternative keys
+    (maybe && (maybe.shareUri as string | undefined)) ??
+    (maybeData && (maybeData.share_uri as string | undefined)) ??
+    (maybe && (maybe.share_url as string | undefined));
+
+  const computedShareUri = shareUri ?? shareUriFromCurrentUser;
+
+  // boardInfo query: fetch automatically when a shareUri (route or current user) exists
+  const boardInfoQuery = useQuery({
+    queryKey: ["boardInfo", computedShareUri],
+    queryFn: ({ queryKey }) => {
+      const uri = queryKey[1] as string;
+      return getBoardInfo(uri);
+    },
+    enabled: Boolean(computedShareUri),
+  });
+
+  // ensure the boardInfo request is made when computedShareUri becomes available
+  useEffect(() => {
+    if (!computedShareUri) return;
+    if (boardInfoQuery.isFetching) return;
+    if (boardInfoQuery.data) return;
+    // trigger fetch
+    void boardInfoQuery.refetch();
+  }, [computedShareUri, boardInfoQuery.isFetching, boardInfoQuery.data, boardInfoQuery.refetch]);
 
   // fetch current user's board list (paginated) when not viewing a shared board
   useEffect(() => {
@@ -79,9 +117,20 @@ function BoardPage() {
   }, [isSharedBoard, currentPage]);
 
   useEffect(() => {
-    if (isSharedBoard && sharedBoardData?.nickname) {
+    // prefer boardInfo name when available (applies to shared and own board)
+    const nameFromInfo = boardInfoQuery.data?.data?.name;
+    if (nameFromInfo) {
+      setOwnerNickname(nameFromInfo);
+    } else if (isSharedBoard && sharedBoardData?.nickname) {
       setOwnerNickname(sharedBoardData.nickname);
     }
+
+    // prefer server-provided message count when available
+    const msgCount = boardInfoQuery.data?.data?.messageCount;
+    if (typeof msgCount === "number") {
+      setBoardTotalElements(msgCount);
+    }
+
     // if shared board provides pagination/total info, reflect it
     if (isSharedBoard && sharedBoardData) {
       const mapped = (sharedBoardData.content ?? []).map((s) => ({
@@ -99,7 +148,7 @@ function BoardPage() {
       setTotalPages(sharedBoardData.totalPages ?? 1);
       setBoardTotalElements(sharedBoardData.totalElements ?? 0);
     }
-  }, [isSharedBoard, sharedBoardData]);
+  }, [isSharedBoard, sharedBoardData, boardInfoQuery.data]);
 
   const ORIGINAL_POS = [
     { id: 1, x: 0, y: 10 },
@@ -132,6 +181,10 @@ function BoardPage() {
     m: 0,
     s: 0,
   });
+  const [frameCenter, setFrameCenter] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const [letterOpenId, setLetterOpenId] = useState<number | null>(null);
   const [messageDetail, setMessageDetail] = useState<
     import("@/types/board").BoardMessageData | null
@@ -141,7 +194,8 @@ function BoardPage() {
 
   useEffect(() => {
     // use a fixed server time as requested
-    const serverNow = new Date("2025-09-05T06:00:00Z");
+  const serverTimeStr = boardInfoQuery?.data?.data?.serverTime ?? "2025-09-05T06:00:00Z";
+    const serverNow = new Date(serverTimeStr);
     const startClient = Date.now();
 
     function update() {
@@ -165,7 +219,7 @@ function BoardPage() {
     update();
     const id = window.setInterval(update, 1000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [boardInfoQuery?.data?.data?.serverTime]);
 
   const computeShift = useCallback(() => {
     const img = shelfRef.current;
@@ -181,11 +235,30 @@ function BoardPage() {
     setShiftPx({ x: shiftX, y: shiftY });
   }, []);
 
+  const computeFrameCenter = useCallback(() => {
+    const img = frameRef.current;
+    if (!img) return;
+    const rect = img.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    setFrameCenter({ x: centerX, y: centerY });
+  }, []);
+
   useEffect(() => {
     computeShift();
+    computeFrameCenter();
     window.addEventListener("resize", computeShift);
-    return () => window.removeEventListener("resize", computeShift);
-  }, [computeShift]);
+    window.addEventListener("resize", computeFrameCenter);
+    return () => {
+      window.removeEventListener("resize", computeShift);
+      window.removeEventListener("resize", computeFrameCenter);
+    };
+  }, [computeShift, computeFrameCenter]);
+
+  useEffect(() => {
+    // recompute frame center when needed
+    computeFrameCenter();
+  }, [computeFrameCenter]);
 
   useEffect(() => {
     if (letterOpenId !== null) {
@@ -258,10 +331,36 @@ function BoardPage() {
 
       {/* decorative frame image: top 99px, flush left */}
       <img
+        ref={frameRef}
         src={FrameImg}
         alt=""
         aria-hidden
+        onLoad={() => {
+          // compute center when the frame image has loaded
+          setTimeout(() => {
+            const ev = new Event("resize");
+            window.dispatchEvent(ev);
+          }, 0);
+        }}
         style={{ position: "absolute", top: 99, left: 0 }}
+      />
+
+      {/* avatar centered on the frame */}
+      <img
+        src={boardInfoQuery?.data?.data?.profileImage ?? DefaultProfile}
+        alt="profile"
+        style={{
+          position: "fixed",
+          left: frameCenter.x || 0,
+          top: frameCenter.y || 0,
+          transform: "translate(-50%, -50%)",
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          objectFit: "cover",
+          zIndex: 30,
+          pointerEvents: "none",
+        }}
       />
 
       {/* fixed-server countdown to next Jan 1 */}
@@ -283,9 +382,11 @@ function BoardPage() {
         className="relative flex w-full flex-1 flex-col items-center justify-end"
       >
         <div className="absolute top-20 left-[155px] mt-[20px]">
-          <span className="font-primary text-[20px] text-brown-100">
-            {ownerNickname} 님의 LP 보드
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="font-primary text-[20px] text-brown-100">
+              {ownerNickname} 님의 LP 보드
+            </span>
+          </div>
           <div
             className="mt-3 flex items-center"
             style={{ width: 98, height: 25 }}
@@ -303,11 +404,7 @@ function BoardPage() {
             >
               <BoardNoteIcon style={{ width: 12, height: 12 }} />
               <span className="ml-1 whitespace-nowrap font-bold">
-                총{" "}
-                {isSharedBoard && sharedBoardData
-                  ? sharedBoardData.totalElements
-                  : "00"}
-                개 음반
+                총 {boardInfoQuery?.data?.data?.messageCount ?? (isSharedBoard ? sharedBoardData?.totalElements : boardTotalElements) ?? "00"} 개 음반
               </span>
             </div>
           </div>

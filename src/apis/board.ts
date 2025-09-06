@@ -10,6 +10,7 @@ import type {
   SharedBoardResponse,
 } from "@/types/board";
 
+// 보드 생성
 export const createBoard = async (
   request: CreateBoardRequest
 ): Promise<CreateBoardResponse> => {
@@ -19,10 +20,12 @@ export const createBoard = async (
   );
 };
 
+// 보드 공유 링크 반환
 export const getBoardShare = async (): Promise<GetBoardShareResponse> => {
   return apiGet<GetBoardShareResponse>(API_ENDPOINTS.BOARD.SHARE);
 };
 
+//공유 보드 메세지 반환
 export const getSharedBoard = async (
   shareUri: string,
   page: number = 0,
@@ -41,6 +44,7 @@ export const getSharedBoard = async (
   );
 };
 
+//보드 정보 반환
 export const getBoardInfo = async (
   shareUri: string
 ): Promise<BoardInfoResponse> => {
@@ -49,12 +53,14 @@ export const getBoardInfo = async (
   );
 };
 
+//보드 상세 메세지 반환
 export const getBoardDetail = async (
   messageId: string
 ): Promise<BoardMessageResponse> => {
   return apiGet<BoardMessageResponse>(API_ENDPOINTS.BOARD.DETAIL(messageId));
 };
 
+//보드 리스트 반환
 export const getBoardList = async (
   page = 0,
   size = 10,
