@@ -1,4 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getBoardInfo } from "@/apis/board";
 import { PageLayout } from "@/components/ui/page-layout";
 import { SearchInput } from "@/components/ui/search-input";
 import LetterStep from "../components/letter-step";
@@ -13,6 +15,16 @@ export default function LetterGuidePage({
   const navigate = useNavigate();
   const { shareUri } = useParams();
   const location = useLocation();
+
+  // fetch board info when shareUri is present to get the owner's name
+  const boardInfoQuery = useQuery({
+    queryKey: ["boardInfo", shareUri],
+    queryFn: () => getBoardInfo(shareUri ?? ""),
+    enabled: Boolean(shareUri),
+  });
+
+  const computedNickname =
+    boardInfoQuery.data?.data?.name ?? (nickname as string);
 
   const isJoinPage = location.pathname.startsWith("/join/");
   const isFirstTimeJoin = location.pathname === "/join/letter/guide";
@@ -46,7 +58,7 @@ export default function LetterGuidePage({
           </>
         ) : (
           <>
-            {nickname} 님께 <br />
+            {computedNickname} 님께 <br />
             새해 기념 어떤 노래를
             <br />
             들려드릴까요?

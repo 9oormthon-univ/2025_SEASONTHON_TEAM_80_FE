@@ -391,13 +391,17 @@ function BoardPage() {
       className="relative flex min-h-screen flex-col"
       style={{ paddingTop: 140, paddingBottom: 96 + bottomGroupHeight }}
     >
-      <div className="fixed top-[20px] left-[12px] z-40">
+      <div
+        className="fixed z-40"
+        style={{ top: 20, left: screenWidth >= 450 ? 10 : 12 }}
+      >
         <HeaderIcon />
       </div>
       <button
         type="button"
         onClick={() => setIsSidebarOpen(true)}
-        className="fixed top-[20px] right-[20px] z-40 cursor-pointer"
+        className="fixed z-40 cursor-pointer"
+        style={{ top: 20, right: screenWidth >= 450 ? 10 : 20 }}
       >
         <HamburgerIcon />
       </button>
@@ -455,7 +459,15 @@ function BoardPage() {
         ref={containerRef}
         className="relative flex w-full flex-1 flex-col items-center justify-end"
       >
-        <div className="fixed top-20 left-[147px] z-40 mt-[20px]">
+        <div
+          className="fixed z-40"
+          style={{
+            top: "10%",
+            left: "50%",
+            transform: "translateX(calc(-20%))",
+            marginTop: 20,
+          }}
+        >
           <div className="flex items-center gap-3">
             <span className="font-primary text-[20px] text-brown-100">
               {ownerNickname} 님의 LP 보드
@@ -738,7 +750,7 @@ function BoardPage() {
                   }}
                   className="font-letter"
                 >
-                  To. 최대여섯글자
+                  To. {ownerNickname}
                 </div>
                 {/* read-only display box below the To. label: 294x225, font-letter 17px */}
                 <div
@@ -780,7 +792,7 @@ function BoardPage() {
                     color: "#000",
                   }}
                 >
-                  From. 여섯글자
+                  From. ${messageDetail?.senderName}
                 </div>
                 {messageDetail?.coverImageUrl ? (
                   <img
