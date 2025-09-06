@@ -46,7 +46,7 @@ export default function LetterWritePage() {
         console.error("Failed to fetch board info:", error);
       }
     };
-    
+
     fetchBoardInfo();
   }, [shareUri]);
 

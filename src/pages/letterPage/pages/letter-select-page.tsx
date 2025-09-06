@@ -30,7 +30,7 @@ export default function LetterSelectPage({
         console.error("Failed to fetch board info:", error);
       }
     };
-    
+
     fetchBoardInfo();
   }, [shareUri]);
 
