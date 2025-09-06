@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AirplaneBackground from "@/assets/bg_airplane.webp";
 import AirplaneObject from "@/assets/obj_airplane.webp";
 import SwooshObject from "@/assets/obj_swoosh.webp";
@@ -7,8 +7,15 @@ import { NavigationButton } from "@/components/ui/navigation-button";
 export default function LetterCompletePage() {
   const navigate = useNavigate();
 
-  const handleNavigation = () => {
+  const { shareUri } = useParams();
+
+  const handleToHome = () => {
     navigate("/");
+  };
+
+  const handleToBoard = () => {
+    if (shareUri) navigate(`/board/${shareUri}`);
+    else navigate("/board");
   };
 
   return (
@@ -81,13 +88,17 @@ export default function LetterCompletePage() {
       </div>
 
       <div className="z-10 mt-auto flex flex-row gap-3 pb-4">
-        <NavigationButton active={true} className="flex flex-1 bg-brown-200">
+        <NavigationButton
+          active={true}
+          className="flex flex-1 bg-brown-200"
+          onClick={handleToHome}
+        >
           처음 화면
         </NavigationButton>
         <NavigationButton
           active={true}
           className="flex-2"
-          onClick={handleNavigation}
+          onClick={handleToBoard}
         >
           나도 LP 보드 만들기
         </NavigationButton>

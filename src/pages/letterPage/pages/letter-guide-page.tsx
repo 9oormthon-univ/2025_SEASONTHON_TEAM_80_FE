@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PageLayout } from "@/components/ui/page-layout";
 import { SearchInput } from "@/components/ui/search-input";
 import LetterStep from "../components/letter-step";
@@ -11,9 +11,10 @@ export default function LetterGuidePage({
   nickname = "닉네임",
 }: LetterGuidePageProps) {
   const navigate = useNavigate();
+  const { shareUri } = useParams();
 
   const handleSearchClick = () => {
-    navigate("/letter/search");
+    navigate(shareUri ? `/letter/search/${shareUri}` : "/letter/search");
   };
 
   return (

@@ -24,6 +24,7 @@ function LinkShareButton({
   onShareSuccess,
   onShareError,
   isSharedBoard = false,
+  shareUri,
   ...props
 }: LinkShareButtonProps) {
   const { shareBoard, isSharing } = useShare();
@@ -32,7 +33,9 @@ function LinkShareButton({
 
   const handleClick = async () => {
     if (isSharedBoard) {
-      navigate(ROUTES.LETTER.GUIDE);
+      // preserve the shareUri when navigating into the letter flow
+      if (shareUri) navigate(`/letter/guide/${shareUri}`);
+      else navigate(ROUTES.LETTER.GUIDE.replace("/:shareUri", ""));
       return;
     }
 

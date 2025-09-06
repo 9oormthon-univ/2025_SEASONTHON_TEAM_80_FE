@@ -4,11 +4,13 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { getPopularMusicCharts, getSearchedSongs } from "@/apis/music";
 import { BackButton } from "@/components/ui/back-button";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { SearchInput } from "@/components/ui/search-input";
 import { MusicList } from "@/pages/letterPage/components/music-list";
+import type { MessageData } from "@/types/message";
 import type { Song as ApiSong, MusicChart } from "@/types/song";
 
 type ListSong = {
@@ -20,11 +22,15 @@ type ListSong = {
 };
 
 function MusicSearchPage() {
+  const navigate = useNavigate();
+  const { shareUri } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [recommended, setRecommended] = useState<ListSong[]>([]);
   const [results, setResults] = useState<ListSong[]>([]);
   const [selectedSongs, setSelectedSongs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const LOCALSTORAGE_KEY = "messageDraft";
 
   const toggleSongSelection = (songId: string) => {
     setSelectedSongs((prev) => (prev.includes(songId) ? [] : [songId]));
@@ -85,7 +91,7 @@ function MusicSearchPage() {
     try {
       const songs = await getSearchedSongs(q);
       setResults(songs.map(mapApiSongToListSong));
-    } catch (e) {
+    } catch (_e) {
       setResults([]);
     } finally {
       setLoading(false);
@@ -187,7 +193,29 @@ function MusicSearchPage() {
         </div>
 
         <div className="flex h-[46px] items-end bg-white px-4 pb-5">
-          <NavigationButton active={selectedSongs.length > 0}>
+          <NavigationButton
+            active={selectedSongs.length > 0}
+            onClick={() => {
+              if (!selectedSong) return;
+              const draft: Partial<MessageData> = {
+                shareUri: "",
+                senderName: "",
+                content: "",
+                songTitle: selectedSong.song_title,
+                artist: selectedSong.artist,
+                albumImageUrl: selectedSong.album_cover,
+                songUrl: selectedSong.streaming_url,
+              };
+              try {
+                localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(draft));
+              } catch (e) {
+                console.error("Failed to save draft to localStorage", e);
+              }
+              navigate(
+                shareUri ? `/letter/write/${shareUri}` : "/letter/write"
+              );
+            }}
+          >
             선택
           </NavigationButton>
         </div>
