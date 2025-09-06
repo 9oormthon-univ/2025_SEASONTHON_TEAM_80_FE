@@ -42,8 +42,13 @@ export interface SharedBoardInfo {
 
 export interface BoardListItem {
   messageId: string;
-  sender: string;
+  senderName: string;
+  content: string;
+  songId: string;
+  songName: string;
+  artist: string;
   coverImageUrl: string;
+  songUrl: string;
   read: boolean;
 }
 
