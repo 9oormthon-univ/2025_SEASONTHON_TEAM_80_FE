@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { logout } from "@/apis/auth";
 import { getBoardInfo } from "@/apis/board";
 import BellIcon from "@/assets/ic_bell.svg?react";
@@ -9,7 +10,6 @@ import PersonIcon from "@/assets/ic_person.svg?react";
 import SignOutIcon from "@/assets/ic_sign_out.svg?react";
 import VideoIcon from "@/assets/ic_video.svg?react";
 import XIcon from "@/assets/ic_x.svg?react";
-import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   nickname?: string;
