@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { PageLayout } from "@/components/ui/page-layout";
 import { SearchInput } from "@/components/ui/search-input";
 import LetterStep from "../components/letter-step";
@@ -12,20 +12,46 @@ export default function LetterGuidePage({
 }: LetterGuidePageProps) {
   const navigate = useNavigate();
   const { shareUri } = useParams();
+  const location = useLocation();
+
+  const isJoinPage = location.pathname.startsWith("/join/");
+  const isFirstTimeJoin = location.pathname === "/join/letter/guide";
 
   const handleSearchClick = () => {
-    navigate(shareUri ? `/letter/search/${shareUri}` : "/letter/search");
+    if (isJoinPage) {
+      if (isFirstTimeJoin) {
+        navigate("/join/letter/search");
+      } else {
+        navigate(
+          shareUri ? `/join/letter/search/${shareUri}` : "/join/letter/search"
+        );
+      }
+    } else {
+      navigate(shareUri ? `/letter/search/${shareUri}` : "/letter/search");
+    }
   };
 
   return (
     <PageLayout
       title={
-        <>
-          {nickname} 님께 <br />
-          새해 기념 어떤 노래를
-          <br />
-          들려드릴까요?
-        </>
+        isFirstTimeJoin ? (
+          <>
+            새해를 맞이하는 <br />
+            나만의 플레이 리스트를 <br /> 만들어 볼까요?
+          </>
+        ) : isJoinPage ? (
+          <>
+            새해를 맞이하는 <br />
+            나만의 플레이 리스트를 <br /> 만들어 볼까요?
+          </>
+        ) : (
+          <>
+            {nickname} 님께 <br />
+            새해 기념 어떤 노래를
+            <br />
+            들려드릴까요?
+          </>
+        )
       }
     >
       <LetterStep

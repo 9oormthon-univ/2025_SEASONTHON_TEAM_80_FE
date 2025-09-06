@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getBoardInfo } from "@/apis/board";
 import { postMessage } from "@/apis/message";
 import LetterPaperBg from "@/assets/bg_letterpaper.webp";
@@ -14,6 +14,10 @@ import LetterStep from "../components/letter-step";
 export default function LetterWritePage() {
   const navigate = useNavigate();
   const { shareUri } = useParams();
+  const location = useLocation();
+
+  const isJoinPage = location.pathname.startsWith("/join/");
+  const isFirstTimeJoin = location.pathname === "/join/letter/write";
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [letterContent, setLetterContent] = useState("");
   const [authorName, setAuthorName] = useState("");
@@ -89,9 +93,19 @@ export default function LetterWritePage() {
         // on success, remove draft
         localStorage.removeItem(LOCALSTORAGE_KEY);
 
-        navigate(
-          shareUri ? `/letter/complete/${shareUri}` : "/letter/complete"
-        );
+        if (isJoinPage) {
+          if (isFirstTimeJoin) {
+            navigate("/join/complete");
+          } else {
+            navigate(
+              shareUri ? `/letter/complete/${shareUri}` : "/letter/complete"
+            );
+          }
+        } else {
+          navigate(
+            shareUri ? `/letter/complete/${shareUri}` : "/letter/complete"
+          );
+        }
       } catch (err) {
         // keep draft in storage on failure; optionally show error
         // eslint-disable-next-line no-console
@@ -108,10 +122,21 @@ export default function LetterWritePage() {
     <>
       <PageLayout
         title={
-          <>
-            노래랑 함께 보낼 <br />
-            마음을 작성해봐요.
-          </>
+          isFirstTimeJoin ? (
+            <>
+              가장 수고한 당신에게 <br /> 편지 한 통을 써주세요.
+            </>
+          ) : isJoinPage ? (
+            <>
+              가장 수고한 당신에게
+              <br /> 편지 한 통을 써주세요.
+            </>
+          ) : (
+            <>
+              노래랑 함께 보낼 <br />
+              마음을 작성해봐요.
+            </>
+          )
         }
         bottomContent={
           <NavigationButton

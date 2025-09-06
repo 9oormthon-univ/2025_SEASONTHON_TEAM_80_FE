@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getBoardInfo } from "@/apis/board";
 import PlayIcon from "@/assets/ic_play.svg?react";
 import { NavigationButton } from "@/components/ui/navigation-button";
@@ -18,7 +18,11 @@ export default function LetterSelectPage({
 }: LetterSelectPageProps) {
   const navigate = useNavigate();
   const { shareUri } = useParams();
+  const location = useLocation();
   const [recipientNickname, setRecipientNickname] = useState(nickname);
+
+  const isJoinPage = location.pathname.startsWith("/join/");
+  const isFirstTimeJoin = location.pathname === "/join/letter/select";
 
   useEffect(() => {
     const fetchBoardInfo = async () => {
@@ -35,15 +39,35 @@ export default function LetterSelectPage({
   }, [shareUri]);
 
   const handleClick = () => {
-    navigate(shareUri ? `/letter/write/${shareUri}` : "/letter/write");
+    if (isJoinPage) {
+      if (isFirstTimeJoin) {
+        navigate("/join/letter/write");
+      } else {
+        navigate(
+          shareUri ? `/join/letter/write/${shareUri}` : "/join/letter/write"
+        );
+      }
+    } else {
+      navigate(shareUri ? `/letter/write/${shareUri}` : "/letter/write");
+    }
   };
 
   return (
     <PageLayout
       title={
-        <>
-          {recipientNickname} 님께 <br />이 노래를 들려드릴까요?
-        </>
+        isFirstTimeJoin ? (
+          <>
+            미래의 나에게 <br />이 노래를 들려드릴까요?{" "}
+          </>
+        ) : isJoinPage ? (
+          <>
+            미래의 나에게 <br /> 이 노래를 들려드릴까요?
+          </>
+        ) : (
+          <>
+            {recipientNickname} 님께 <br />이 노래를 들려드릴까요?
+          </>
+        )
       }
       bottomContent={
         <NavigationButton

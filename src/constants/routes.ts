@@ -4,11 +4,14 @@ export const ROUTES = {
   SHARED_BOARD: "/board/:shareUri",
   JOIN: {
     NICKNAME: "/join/nickname",
-
-    SEARCH: "/join/letter/search/:shareUri",
-    SELECT: "/join/letter/select/:shareUri",
-    WRITE: "/join/letter/write/:shareUri",
-
+    GUIDE: "/join/letter/guide",
+    GUIDE_WITH_SHARE: "/join/letter/guide/:shareUri",
+    SEARCH: "/join/letter/search",
+    SEARCH_WITH_SHARE: "/join/letter/search/:shareUri",
+    SELECT: "/join/letter/select",
+    SELECT_WITH_SHARE: "/join/letter/select/:shareUri",
+    WRITE: "/join/letter/write",
+    WRITE_WITH_SHARE: "/join/letter/write/:shareUri",
     COMPLETE: "/join/complete",
   },
   LETTER: {

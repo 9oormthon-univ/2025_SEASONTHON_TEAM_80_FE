@@ -1,10 +1,11 @@
 import {
   type ChangeEvent,
   type KeyboardEvent,
+  useCallback,
   useEffect,
   useState,
 } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getPopularMusicCharts, getSearchedSongs } from "@/apis/music";
 import { BackButton } from "@/components/ui/back-button";
 import { NavigationButton } from "@/components/ui/navigation-button";
@@ -24,6 +25,10 @@ type ListSong = {
 function MusicSearchPage() {
   const navigate = useNavigate();
   const { shareUri } = useParams();
+  const location = useLocation();
+
+  const isJoinPage = location.pathname.startsWith("/join/");
+  const isFirstTimeJoin = location.pathname === "/join/letter/search";
   const [searchQuery, setSearchQuery] = useState("");
   const [recommended, setRecommended] = useState<ListSong[]>([]);
   const [results, setResults] = useState<ListSong[]>([]);
@@ -36,21 +41,27 @@ function MusicSearchPage() {
     setSelectedSongs((prev) => (prev.includes(songId) ? [] : [songId]));
   };
 
-  const mapChartToListSong = (chart: MusicChart): ListSong => ({
-    id: chart.musicId,
-    song_title: chart.songName,
-    artist: chart.artist,
-    album_cover: chart.albumImageUrl,
-    streaming_url: chart.songUrl,
-  });
+  const mapChartToListSong = useCallback(
+    (chart: MusicChart): ListSong => ({
+      id: chart.musicId,
+      song_title: chart.songName,
+      artist: chart.artist,
+      album_cover: chart.albumImageUrl,
+      streaming_url: chart.songUrl,
+    }),
+    []
+  );
 
-  const mapApiSongToListSong = (s: ApiSong): ListSong => ({
-    id: s.songId,
-    song_title: s.songTitle,
-    artist: s.artist,
-    album_cover: s.coverImage,
-    streaming_url: s.streamingUrl || s.prestreamingUrl || "",
-  });
+  const mapApiSongToListSong = useCallback(
+    (s: ApiSong): ListSong => ({
+      id: s.songId,
+      song_title: s.songTitle,
+      artist: s.artist,
+      album_cover: s.coverImage,
+      streaming_url: s.streamingUrl || s.prestreamingUrl || "",
+    }),
+    []
+  );
 
   // 인기 차트(추천) 불러오기
   useEffect(() => {
@@ -62,7 +73,9 @@ function MusicSearchPage() {
 
         const chartArray: unknown = Array.isArray(charts)
           ? charts
-          : ((charts as any)?.data ?? (charts as any)?.items ?? []);
+          : ((charts as Record<string, unknown>)?.data ??
+            (charts as Record<string, unknown>)?.items ??
+            []);
 
         if (!Array.isArray(chartArray)) {
           setRecommended([]);
@@ -78,7 +91,7 @@ function MusicSearchPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [mapChartToListSong]);
 
   const performSearch = async (query: string) => {
     const q = query.trim();
@@ -119,7 +132,11 @@ function MusicSearchPage() {
           <BackButton />
         </div>
         <h1 className="flex-1 text-center font-bold text-base text-red-200">
-          노래 검색
+          {isFirstTimeJoin
+            ? "미래의 나에게 어떤 노래를 들려드릴까요?"
+            : isJoinPage
+              ? "미래의 나에게 어떤 노래를 들려드릴까요?"
+              : "노래 검색"}
         </h1>
       </div>
 
@@ -211,9 +228,21 @@ function MusicSearchPage() {
               } catch (e) {
                 console.error("Failed to save draft to localStorage", e);
               }
-              navigate(
-                shareUri ? `/letter/write/${shareUri}` : "/letter/write"
-              );
+              if (isJoinPage) {
+                if (isFirstTimeJoin) {
+                  navigate("/join/letter/select");
+                } else {
+                  navigate(
+                    shareUri
+                      ? `/join/letter/select/${shareUri}`
+                      : "/join/letter/select"
+                  );
+                }
+              } else {
+                navigate(
+                  shareUri ? `/letter/select/${shareUri}` : "/letter/select"
+                );
+              }
             }}
           >
             선택

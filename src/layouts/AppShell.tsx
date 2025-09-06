@@ -11,7 +11,10 @@ export default function AppShell({ children }: PropsWithChildren) {
       ([key]) => key !== "/" && pathname.startsWith(key)
     )?.[1];
 
-  const isLetterSearch = pathname === "/letter/search";
+  const isLetterSearch =
+    pathname === "/letter/search" ||
+    pathname.startsWith("/join/letter/search") ||
+    pathname.startsWith("/letter/search");
   const isErrorPage =
     !routeBg[pathname] &&
     !Object.entries(routeBg).find(

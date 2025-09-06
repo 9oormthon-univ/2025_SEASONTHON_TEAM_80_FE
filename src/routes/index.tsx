@@ -29,6 +29,70 @@ export default function AppRoutes() {
         }
       />
       <Route
+        path={ROUTES.JOIN.GUIDE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <LetterGuidePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.GUIDE_WITH_SHARE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <LetterGuidePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.SEARCH}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <MusicSearchPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.SEARCH_WITH_SHARE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <MusicSearchPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.SELECT}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <LetterSelectPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.SELECT_WITH_SHARE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <LetterSelectPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.WRITE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <LetterWritePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={ROUTES.JOIN.WRITE_WITH_SHARE}
+        element={
+          <ProtectedRoute requireBoard={false}>
+            <LetterWritePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path={ROUTES.JOIN.COMPLETE}
         element={
           <ProtectedRoute requireBoard={false}>
