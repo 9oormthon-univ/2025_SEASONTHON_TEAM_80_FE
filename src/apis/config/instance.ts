@@ -39,7 +39,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 // Axios 인스턴스 생성
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_SERVER_URL}${import.meta.env.VITE_API_VERSION || ""}`,
-  timeout: 100000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
