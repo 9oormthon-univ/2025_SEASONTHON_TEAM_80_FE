@@ -45,6 +45,7 @@ export function BoardHeader({
         onClick={onMenuClick}
         className="fixed z-40 cursor-pointer"
         style={{ top: 20, right: screenWidth >= 450 ? 10 : 20 }}
+        aria-label="메뉴 열기"
       >
         <HamburgerIcon />
       </button>

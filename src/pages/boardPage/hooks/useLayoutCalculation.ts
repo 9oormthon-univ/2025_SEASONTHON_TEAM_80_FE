@@ -37,7 +37,7 @@ export function useLayoutCalculation() {
     const currentScreenWidth = window.innerWidth;
     const scale =
       currentScreenWidth <= 400
-        ? Math.max(0.7, (currentScreenWidth / 400) * 0.8)
+        ? Math.max(0.8, (currentScreenWidth / 400) * 0.9)
         : 1;
     const ALBUM_MAX_X = 265 * scale;
     const ALBUM_WIDTH = 60; // placeholder width used in layout
@@ -82,10 +82,8 @@ export function useLayoutCalculation() {
     const ro = new ResizeObserver(update);
     ro.observe(el);
 
-    window.addEventListener("resize", update);
     return () => {
       ro.disconnect();
-      window.removeEventListener("resize", update);
     };
   }, []);
 
