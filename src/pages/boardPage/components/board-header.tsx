@@ -70,8 +70,8 @@ export function BoardHeader({
         alt="profile"
         style={{
           position: "fixed",
-          left: frameCenter.x || 0,
-          top: frameCenter.y || 0,
+          left: frameCenter.x ?? 0,
+          top: frameCenter.y ?? 0,
           transform: "translate(-50%, -50%)",
           width: 36,
           height: 36,
