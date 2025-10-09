@@ -178,7 +178,8 @@ export default function LetterWritePage() {
         <div className="dynamic-bottom-position absolute z-20 h-[294px] w-[294px] px-5 py-5">
           {/* To. 닉네임 - 좌측 상단 */}
           <div className="absolute top-5 left-5 font-letter text-black text-xs">
-            To. {isFirstTimeJoin || isJoinPage ? "미래의 나" : recipientNickname}
+            To.{" "}
+            {isFirstTimeJoin || isJoinPage ? "미래의 나" : recipientNickname}
           </div>
           <img
             src={StampWebp}

@@ -73,37 +73,26 @@ export function useBoardData(shareUri?: string) {
     const nameFromInfo = boardInfoQuery.data?.data?.name;
     if (nameFromInfo && nameFromInfo !== ownerNickname) {
       setOwnerNickname(nameFromInfo);
-    } else if (
-      isSharedBoard &&
-      sharedBoardData?.nickname &&
-      sharedBoardData.nickname !== ownerNickname
-    ) {
-      setOwnerNickname(sharedBoardData.nickname);
     }
-  }, [
-    boardInfoQuery.data?.data?.name,
-    sharedBoardData?.nickname,
-    isSharedBoard,
-    ownerNickname,
-  ]);
+  }, [boardInfoQuery.data?.data?.name, ownerNickname]);
 
   useEffect(() => {
     // handle shared board data
-    if (isSharedBoard && sharedBoardData) {
-      const mapped = (sharedBoardData.content ?? []).map((s) => ({
+    if (isSharedBoard && sharedBoardData?.data) {
+      const mapped = (sharedBoardData.data.content ?? []).map((s) => ({
         messageId: s.messageId,
-        senderName: s.sender,
+        senderName: "",
         content: "",
-        songId: "",
+        songId: s.musicId,
         songName: "",
         artist: "",
-        coverImageUrl: s.coverImageUrl,
+        coverImageUrl: s.musicCoverUrl,
         songUrl: "",
-        read: s.read ?? false,
+        read: false,
       }));
       setBoardList(mapped);
-      setTotalPages(sharedBoardData.totalPages ?? 1);
-      setBoardTotalElements(sharedBoardData.totalElements ?? 0);
+      setTotalPages(sharedBoardData.data.totalPages ?? 1);
+      setBoardTotalElements(sharedBoardData.data.totalElements ?? 0);
     }
   }, [isSharedBoard, sharedBoardData]);
 

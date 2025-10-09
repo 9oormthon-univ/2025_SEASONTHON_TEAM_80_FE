@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useAudio } from "@/hooks/useAudio";
-import type { BoardListItem, SharedBoardMessage } from "@/types/board";
+import type { BoardListItem, SharedBoardResponse } from "@/types/board";
 
 export function useLetterModal(
   isSharedBoard: boolean,
   boardList: BoardListItem[],
-  sharedBoardData?: { content?: SharedBoardMessage[] }
+  sharedBoardData?: SharedBoardResponse
 ) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const [letterOpenId, setLetterOpenId] = useState<number | null>(null);
@@ -33,7 +33,7 @@ export function useLetterModal(
 
       // determine messageId from current data (shared or boardList)
       const posIndex = letterOpenId - 1;
-      const sharedContent = sharedBoardData?.content ?? [];
+      const sharedContent = sharedBoardData?.data?.content ?? [];
       const possible = isSharedBoard
         ? sharedContent[posIndex]
         : boardList[posIndex];
@@ -64,7 +64,14 @@ export function useLetterModal(
       // Always stop audio when letter is closed
       stopAudio();
     };
-  }, [letterOpenId, isSharedBoard, boardList, sharedBoardData, playAudio, stopAudio]);
+  }, [
+    letterOpenId,
+    isSharedBoard,
+    boardList,
+    sharedBoardData,
+    playAudio,
+    stopAudio,
+  ]);
 
   const closeModal = () => {
     setLetterOpenId(null);

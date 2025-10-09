@@ -1,11 +1,15 @@
 import ShelfBg from "@/assets/bg_shelf.webp";
 import HatIcon from "@/assets/ic_hat.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
-import type { BoardListItem, SharedBoardMessage } from "@/types/board";
+import type {
+  BoardListItem,
+  SharedBoardMessage,
+  SharedBoardResponse,
+} from "@/types/board";
 
 interface AlbumGridProps {
   boardList: BoardListItem[];
-  sharedBoardData?: { content?: SharedBoardMessage[] };
+  sharedBoardData?: SharedBoardResponse;
   isSharedBoard: boolean;
   shelfRef: React.RefObject<HTMLImageElement | null>;
   shelfWrapperRef: React.RefObject<HTMLDivElement | null>;
@@ -63,7 +67,7 @@ export function AlbumGrid({
 
       {getAdjustedPositions().map((orig) => {
         const id = orig.id;
-        
+
         // pocket
         if (
           ORIGINAL_POS.find((p) => p.id === id)?.x === POCKET_COORD.x &&
@@ -113,10 +117,8 @@ export function AlbumGrid({
         }
 
         // choose item for this slot depending on board type
-        const sharedContent = sharedBoardData?.content ?? [];
-        const item = isSharedBoard
-          ? sharedContent[id - 1]
-          : boardList[id - 1];
+        const sharedContent = sharedBoardData?.data?.content ?? [];
+        const item = isSharedBoard ? sharedContent[id - 1] : boardList[id - 1];
 
         // if there is no item for this slot, render nothing
         if (!item) return null;
@@ -186,7 +188,7 @@ export function AlbumGrid({
                     const sharedItem = item as SharedBoardMessage;
                     return (
                       <img
-                        src={sharedItem.coverImageUrl}
+                        src={sharedItem.musicCoverUrl}
                         alt={`album-cover-${sharedItem.messageId}`}
                         style={{
                           width: "100%",

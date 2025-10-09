@@ -51,9 +51,9 @@ export default function LetterSelectPage({
       const raw = localStorage.getItem("messageDraft");
       if (!raw) return;
       const parsed = JSON.parse(raw) as Record<string, unknown>;
-      
+
       console.log("localStorage data:", parsed); // 디버그용
-      
+
       const mapped: Song = {
         // mapping from localStorage data structure
         songId: (parsed.songId as string) ?? "",
@@ -139,7 +139,9 @@ export default function LetterSelectPage({
             <p className="text-base text-white">
               {displayedSong?.songTitle || "곡 제목"}
             </p>
-            <p className="text-gray-500 text-xs">{displayedSong?.artist || "가수"}</p>
+            <p className="text-gray-500 text-xs">
+              {displayedSong?.artist || "가수"}
+            </p>
           </div>
 
           <button

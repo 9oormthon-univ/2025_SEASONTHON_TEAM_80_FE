@@ -64,7 +64,9 @@ function BoardPage() {
         ownerNickname={ownerNickname}
         messageCount={
           boardInfoQuery?.data?.data?.messageCount ??
-          (isSharedBoard ? sharedBoardData?.totalElements : boardTotalElements)
+          (isSharedBoard
+            ? sharedBoardData?.data?.totalElements
+            : boardTotalElements)
         }
         timeRemaining={timeRemaining}
         screenWidth={screenWidth}
@@ -117,8 +119,8 @@ function BoardPage() {
 
       <BottomNavigation
         totalPages={
-          isSharedBoard && sharedBoardData
-            ? sharedBoardData.totalPages
+          isSharedBoard && sharedBoardData?.data
+            ? sharedBoardData.data.totalPages
             : totalPages
         }
         currentPage={currentPage}

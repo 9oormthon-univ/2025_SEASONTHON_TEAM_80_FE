@@ -18,22 +18,23 @@ export interface GetBoardShareResponse {
 
 export interface SharedBoardMessage {
   messageId: string;
-  // cover image URL for the shared board item
-  coverImageUrl: string;
-  // sender name
-  sender: string;
-  // whether the message has been read
-  read?: boolean;
+  musicId: string;
+  musicCoverUrl: string;
 }
 
-export interface SharedBoardResponse {
+export interface SharedBoardData {
   content: SharedBoardMessage[];
   pageNumber: number;
   pageSize: number;
   totalElements: number;
   totalPages: number;
-  // owner nickname (optional)
-  nickname?: string;
+}
+
+export interface SharedBoardResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: SharedBoardData;
 }
 
 export interface SharedBoardInfo {
