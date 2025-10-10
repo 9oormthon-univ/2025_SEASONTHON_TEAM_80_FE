@@ -12,7 +12,7 @@ import { NavigationButton } from "@/components/ui/navigation-button";
 import { SearchInput } from "@/components/ui/search-input";
 import { MusicList } from "@/pages/letterPage/components/music-list";
 import type { MessageData } from "@/types/message";
-import type { Song as ApiSong, MusicChart } from "@/types/song";
+import type { Music as ApiMusic, MusicChart } from "@/types/song";
 
 type ListSong = {
   id: string;
@@ -44,21 +44,21 @@ function MusicSearchPage() {
   const mapChartToListSong = useCallback(
     (chart: MusicChart): ListSong => ({
       id: chart.musicId,
-      song_title: chart.songName,
+      song_title: chart.musicName,
       artist: chart.artist,
-      album_cover: chart.albumImageUrl,
-      streaming_url: chart.songUrl,
+      album_cover: chart.musicCoverUrl,
+      streaming_url: chart.musicUrl,
     }),
     []
   );
 
-  const mapApiSongToListSong = useCallback(
-    (s: ApiSong): ListSong => ({
-      id: s.songId,
-      song_title: s.songTitle,
+  const mapApiMusicToListSong = useCallback(
+    (s: ApiMusic): ListSong => ({
+      id: s.musicId,
+      song_title: s.musicTitle,
       artist: s.artist,
-      album_cover: s.coverImage,
-      streaming_url: s.streamingUrl || s.prestreamingUrl || "",
+      album_cover: s.musicCoverUrl,
+      streaming_url: s.musicUrl || s.prestreamingUrl || "",
     }),
     []
   );
@@ -103,7 +103,7 @@ function MusicSearchPage() {
     setLoading(true);
     try {
       const songs = await getSearchedSongs(q);
-      setResults(songs.map(mapApiSongToListSong));
+      setResults(songs.map(mapApiMusicToListSong));
     } catch (_e) {
       setResults([]);
     } finally {
@@ -218,10 +218,10 @@ function MusicSearchPage() {
                 shareUri: "",
                 senderName: "",
                 content: "",
-                songTitle: selectedSong.song_title,
+                musicTitle: selectedSong.song_title,
                 artist: selectedSong.artist,
-                albumImageUrl: selectedSong.album_cover,
-                songUrl: selectedSong.streaming_url,
+                musicCoverUrl: selectedSong.album_cover,
+                musicUrl: selectedSong.streaming_url,
               };
               try {
                 localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(draft));

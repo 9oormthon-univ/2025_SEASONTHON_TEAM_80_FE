@@ -1,10 +1,7 @@
 import ShelfBg from "@/assets/bg_shelf.webp";
 import HatIcon from "@/assets/ic_hat.svg?react";
 import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
-import type {
-  BoardListItem,
-  SharedBoardMessage,
-} from "@/types/board";
+import type { BoardListItem, SharedBoardMessage } from "@/types/board";
 
 interface AlbumGridProps {
   boardList: BoardListItem[] | SharedBoardMessage[];
