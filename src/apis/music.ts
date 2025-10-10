@@ -26,19 +26,18 @@ export const getSearchedSongs = async (query?: string): Promise<Music[]> => {
 
   if (Array.isArray(data)) return data;
 
-  // 중첩된 응답 구조 처리
   const response = data as MusicSearchResponse;
-  if (response.data) {
-    if (Array.isArray(response.data)) {
-      return response.data;
-    }
-    if (response.data.searchResult) {
-      return response.data.searchResult;
-    }
-  }
-  if (response.items) {
-    return response.items;
+  
+  // 중첩된 응답 구조 처리
+  const musicArray =
+    (Array.isArray(response.data) ? response.data : null) ??
+    (response.data && !Array.isArray(response.data) ? response.data.searchResult : null) ??
+    response.items;
+
+  if (!musicArray) {
+    console.warn('Unexpected API response structure:', data);
+    return [];
   }
 
-  return [];
+  return musicArray;
 };
