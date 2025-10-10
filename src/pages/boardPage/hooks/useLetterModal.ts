@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useAudio } from "@/hooks/useAudio";
-import type { BoardListItem, SharedBoardResponse } from "@/types/board";
+import type {
+  BoardListItem,
+  SharedBoardMessage,
+  SharedBoardResponse,
+} from "@/types/board";
 
 export function useLetterModal(
   isSharedBoard: boolean,
-  boardList: BoardListItem[],
+  boardList: BoardListItem[] | SharedBoardMessage[],
   sharedBoardData?: SharedBoardResponse
 ) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -47,9 +51,9 @@ export function useLetterModal(
         if (!mounted) return;
         setMessageDetail(res.data ?? null);
 
-        // Start playing music if songUrl is available
-        if (res.data?.songUrl) {
-          playAudio(res.data.songUrl).catch((error) => {
+        // Start playing music if musicUrl is available
+        if (res.data?.musicUrl) {
+          playAudio(res.data.musicUrl).catch((error) => {
             console.error("Failed to start audio playback:", error);
           });
         }

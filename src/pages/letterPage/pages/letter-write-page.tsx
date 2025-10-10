@@ -21,7 +21,7 @@ export default function LetterWritePage() {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [letterContent, setLetterContent] = useState("");
   const [authorName, setAuthorName] = useState("");
-  const [albumImageUrl, setAlbumImageUrl] = useState<string | null>(null);
+  const [musicCoverUrl, setMusicCoverUrl] = useState<string | null>(null);
   const [recipientNickname, setRecipientNickname] = useState("닉네임");
 
   const LOCALSTORAGE_KEY = "messageDraft";
@@ -34,7 +34,7 @@ export default function LetterWritePage() {
         JSON.parse(stored);
       if (parsed.senderName) setAuthorName(parsed.senderName);
       if (parsed.content) setLetterContent(parsed.content);
-      if (parsed.albumImageUrl) setAlbumImageUrl(parsed.albumImageUrl);
+      if (parsed.musicCoverUrl) setMusicCoverUrl(parsed.musicCoverUrl);
     } catch (_e) {
       // ignore
     }
@@ -161,7 +161,7 @@ export default function LetterWritePage() {
         {/* 음악 앨범 사진 */}
         <div className="-translate-y-[90.625px] dynamic-bottom-position absolute right-0 h-[108.75px] w-[108.75px] overflow-hidden rounded-md bg-gray-300">
           <img
-            src={albumImageUrl ?? "/path/to/album-image.jpg"}
+            src={musicCoverUrl ?? "/path/to/album-image.jpg"}
             alt="앨범 커버"
             className="h-full w-full object-cover"
           />
@@ -191,7 +191,7 @@ export default function LetterWritePage() {
           <div className="mb-4 flex justify-end">
             <div className="h-[26px] w-[26px] overflow-hidden rounded-sm bg-gray-300">
               <img
-                src={albumImageUrl ?? "/path/to/album-image.jpg"}
+                src={musicCoverUrl ?? "/path/to/album-image.jpg"}
                 alt="앨범 커버"
                 className="h-full w-full object-cover"
               />

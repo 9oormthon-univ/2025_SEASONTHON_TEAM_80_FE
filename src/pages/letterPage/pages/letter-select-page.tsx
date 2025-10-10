@@ -4,24 +4,24 @@ import { getBoardInfo } from "@/apis/board";
 import PlayIcon from "@/assets/ic_play.svg?react";
 import { NavigationButton } from "@/components/ui/navigation-button";
 import { PageLayout } from "@/components/ui/page-layout";
-import type { Song } from "@/types/song";
+import type { Music } from "@/types/song";
 import LetterStep from "../components/letter-step";
 
 interface LetterSelectPageProps {
   nickname?: string;
-  song?: Song;
+  music?: Music;
 }
 
 export default function LetterSelectPage({
   nickname = "닉네임",
-  song,
+  music,
 }: LetterSelectPageProps) {
   const navigate = useNavigate();
   const { shareUri } = useParams();
   const location = useLocation();
   const [recipientNickname, setRecipientNickname] = useState(nickname);
-  // local song loaded from search draft if `song` prop isn't provided
-  const [localSong, setLocalSong] = useState<Song | undefined>(song);
+  // local music loaded from search draft if `music` prop isn't provided
+  const [localMusic, setLocalMusic] = useState<Music | undefined>(music);
 
   const isJoinPage = location.pathname.startsWith("/join/");
   const isFirstTimeJoin = location.pathname === "/join/letter/select";
@@ -41,9 +41,9 @@ export default function LetterSelectPage({
   }, [shareUri]);
 
   useEffect(() => {
-    // prefer prop `song` if provided
-    if (song) {
-      setLocalSong(song);
+    // prefer prop `music` if provided
+    if (music) {
+      setLocalMusic(music);
       return;
     }
 
@@ -54,26 +54,26 @@ export default function LetterSelectPage({
 
       console.log("localStorage data:", parsed); // 디버그용
 
-      const mapped: Song = {
+      const mapped: Music = {
         // mapping from localStorage data structure
-        songId: (parsed.songId as string) ?? "",
-        songTitle: (parsed.songTitle as string) ?? "",
+        musicId: (parsed.musicId as string) ?? "",
+        musicTitle: (parsed.musicTitle as string) ?? "",
         artist: (parsed.artist as string) ?? "",
-        coverImage: (parsed.albumImageUrl as string) ?? "",
-        streamingUrl: (parsed.songUrl as string) ?? "",
+        musicCoverUrl: (parsed.musicCoverUrl as string) ?? "",
+        musicUrl: (parsed.musicUrl as string) ?? "",
         prestreamingUrl: (parsed.prestreamingUrl as string) ?? "",
       };
 
-      console.log("mapped song:", mapped); // 디버그용
-      setLocalSong(mapped);
+      console.log("mapped music:", mapped); // 디버그용
+      setLocalMusic(mapped);
     } catch (err) {
       // ignore malformed data
       // eslint-disable-next-line no-console
       console.warn("Failed to parse messageDraft from localStorage:", err);
     }
-  }, [song]);
+  }, [music]);
 
-  const displayedSong = localSong ?? song;
+  const displayedMusic = localMusic ?? music;
 
   const handleClick = () => {
     if (isJoinPage) {
@@ -123,11 +123,11 @@ export default function LetterSelectPage({
 
       <div className="mx-auto flex w-60 flex-col gap-4">
         <div className="relative flex h-60 w-60 items-center justify-center self-center rounded bg-white/10 backdrop-blur-md">
-          {displayedSong?.coverImage ? (
+          {displayedMusic?.musicCoverUrl ? (
             <img
               aria-label="album-cover"
               className="h-52 w-52"
-              src={displayedSong.coverImage}
+              src={displayedMusic.musicCoverUrl}
             />
           ) : (
             <div className="h-52 w-52 rounded bg-gray-500" />
@@ -137,10 +137,10 @@ export default function LetterSelectPage({
         <div className="flex flex-row gap-2">
           <div className="flex flex-1 flex-row items-center gap-1 rounded-md bg-white/10 px-4 py-3 backdrop-blur-md">
             <p className="text-base text-white">
-              {displayedSong?.songTitle || "곡 제목"}
+              {displayedMusic?.musicTitle || "곡 제목"}
             </p>
             <p className="text-gray-500 text-xs">
-              {displayedSong?.artist || "가수"}
+              {displayedMusic?.artist || "가수"}
             </p>
           </div>
 
@@ -153,11 +153,11 @@ export default function LetterSelectPage({
         </div>
       </div>
 
-      {displayedSong?.coverImage ? (
+      {displayedMusic?.musicCoverUrl ? (
         <img
           aria-label="album-cover"
           className="-translate-x-1/2 -bottom-22 absolute left-1/2 z-0 h-44 w-44 transform"
-          src={displayedSong.coverImage}
+          src={displayedMusic.musicCoverUrl}
         />
       ) : (
         <div className="-translate-x-1/2 -bottom-20 absolute left-1/2 h-40 w-40 transform bg-gray-500" />

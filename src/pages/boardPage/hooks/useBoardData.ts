@@ -6,13 +6,15 @@ import {
   getBoardShare,
   getSharedBoard,
 } from "@/apis/board";
-import type { BoardListItem } from "@/types/board";
+import type { BoardListItem, SharedBoardMessage } from "@/types/board";
 
 export function useBoardData(shareUri?: string) {
   const isSharedBoard = Boolean(shareUri);
   const [currentPage, setCurrentPage] = useState(0);
   const [ownerNickname, setOwnerNickname] = useState<string>("닉네임");
-  const [boardList, setBoardList] = useState<BoardListItem[]>([]);
+  const [boardList, setBoardList] = useState<
+    BoardListItem[] | SharedBoardMessage[]
+  >([]);
   const [boardTotalElements, setBoardTotalElements] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -79,18 +81,7 @@ export function useBoardData(shareUri?: string) {
   useEffect(() => {
     // handle shared board data
     if (isSharedBoard && sharedBoardData?.data) {
-      const mapped = (sharedBoardData.data.content ?? []).map((s) => ({
-        messageId: s.messageId,
-        senderName: "",
-        content: "",
-        songId: s.musicId,
-        songName: "",
-        artist: "",
-        coverImageUrl: s.musicCoverUrl,
-        songUrl: "",
-        read: false,
-      }));
-      setBoardList(mapped);
+      setBoardList(sharedBoardData.data.content ?? []);
       setTotalPages(sharedBoardData.data.totalPages ?? 1);
       setBoardTotalElements(sharedBoardData.data.totalElements ?? 0);
     }

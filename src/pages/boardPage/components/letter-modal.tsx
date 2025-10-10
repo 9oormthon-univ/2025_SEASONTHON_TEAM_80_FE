@@ -150,9 +150,9 @@ export function LetterModal({
           From. {messageDetail?.senderName}
         </div>
 
-        {messageDetail?.coverImageUrl ? (
+        {messageDetail?.musicCoverUrl ? (
           <img
-            src={messageDetail.coverImageUrl}
+            src={messageDetail.musicCoverUrl}
             alt={`album-${letterOpenId ?? ""}`}
             aria-hidden
             style={{
@@ -201,7 +201,7 @@ export function LetterModal({
         <div className="flex flex-row gap-2">
           <div className="flex flex-1 flex-row items-center gap-1 rounded-md bg-white/10 px-4 py-3 backdrop-blur-md">
             <p className="text-base text-white">
-              {messageDetail?.songName ?? "곡 제목"}
+              {messageDetail?.musicName ?? "곡 제목"}
             </p>
             <p className="text-gray-500 text-xs">
               {messageDetail?.artist ?? "가수"}

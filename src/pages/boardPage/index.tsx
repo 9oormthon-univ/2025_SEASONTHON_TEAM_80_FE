@@ -94,7 +94,6 @@ function BoardPage() {
       <div className="relative flex w-full flex-1 flex-col items-center justify-end">
         <AlbumGrid
           boardList={boardList}
-          sharedBoardData={sharedBoardData}
           isSharedBoard={isSharedBoard}
           shelfRef={shelfRef}
           shelfWrapperRef={shelfWrapperRef}

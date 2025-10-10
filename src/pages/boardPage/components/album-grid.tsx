@@ -4,12 +4,10 @@ import LuckyPocketIcon from "@/assets/ic_lucky_pocket.svg?react";
 import type {
   BoardListItem,
   SharedBoardMessage,
-  SharedBoardResponse,
 } from "@/types/board";
 
 interface AlbumGridProps {
-  boardList: BoardListItem[];
-  sharedBoardData?: SharedBoardResponse;
+  boardList: BoardListItem[] | SharedBoardMessage[];
   isSharedBoard: boolean;
   shelfRef: React.RefObject<HTMLImageElement | null>;
   shelfWrapperRef: React.RefObject<HTMLDivElement | null>;
@@ -22,7 +20,6 @@ interface AlbumGridProps {
 
 export function AlbumGrid({
   boardList,
-  sharedBoardData,
   isSharedBoard,
   shelfRef,
   shelfWrapperRef,
@@ -116,9 +113,8 @@ export function AlbumGrid({
           );
         }
 
-        // choose item for this slot depending on board type
-        const sharedContent = sharedBoardData?.data?.content ?? [];
-        const item = isSharedBoard ? sharedContent[id - 1] : boardList[id - 1];
+        // get item for this slot
+        const item = boardList[id - 1];
 
         // if there is no item for this slot, render nothing
         if (!item) return null;
@@ -203,7 +199,7 @@ export function AlbumGrid({
                     const boardItem = item as BoardListItem;
                     return (
                       <img
-                        src={boardItem.coverImageUrl}
+                        src={boardItem.musicCoverUrl}
                         alt={`album-cover-${boardItem.messageId}`}
                         style={{
                           width: "100%",
